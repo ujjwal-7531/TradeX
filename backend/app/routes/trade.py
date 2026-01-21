@@ -10,6 +10,8 @@ from app.models.portfolio import Portfolio
 from app.models.holding import Holding
 from app.schemas.trade import BuyStockRequest
 from app.schemas.trade import SellStockRequest
+from app.models.transaction import Transaction
+
 from decimal import Decimal
 
 
@@ -97,6 +99,17 @@ def buy_stock(
         holding.avg_price = new_avg
 
     portfolio.cash_balance -= total_cost
+    transaction = Transaction(
+        user_id=user_id,
+        stock_id=stock.id,
+        trade_type="BUY",
+        quantity=data.quantity,
+        price=price,
+        total_value=total_cost
+    )
+
+    db.add(transaction)
+
     db.commit()
 
     return {
@@ -173,7 +186,20 @@ def sell_stock(
         holding.quantity -= data.quantity
     else:
         db.delete(holding)
+        
+        
+    transaction = Transaction(
+        user_id=user_id,
+        stock_id=stock.id,
+        trade_type="SELL",
+        quantity=data.quantity,
+        price=sell_price,
+        total_value=sell_value
+    )
 
+    db.add(transaction)
+
+    
     db.commit()
 
     return {

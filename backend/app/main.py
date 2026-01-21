@@ -10,7 +10,9 @@ from app.routes.watchlists import router as watchlists_router
 from app.models.portfolio import Portfolio
 from app.models.holding import Holding
 from app.routes.trade import router as trade_router
-
+from app.routes.portfolio import router as portfolio_router
+from app.routes.transactions import router as transactions_router
+from app.routes.settings import router as settings_router
 
 app = FastAPI(title="Virtual Trading Platform")
 
@@ -20,6 +22,9 @@ app.include_router(auth_router)
 app.include_router(test_router)
 app.include_router(watchlists_router)
 app.include_router(trade_router)
+app.include_router(portfolio_router)
+app.include_router(transactions_router)
+app.include_router(settings_router)
 
 @app.get("/")
 def root():
