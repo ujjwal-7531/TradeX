@@ -6,6 +6,7 @@ from app.database import SessionLocal
 from app.models.user import User
 from app.schemas.user import UserCreate
 from app.core.security import hash_password, verify_password, create_access_token
+from app.models.portfolio import Portfolio
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -33,7 +34,15 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
+    portfolio = Portfolio(
+        user_id=new_user.id
+    )
+
+    db.add(portfolio)
+    db.commit()
+
     return {"message": "User created successfully"}
+
 
 
 @router.post("/login")
