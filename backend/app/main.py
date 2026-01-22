@@ -13,10 +13,23 @@ from app.routes.trade import router as trade_router
 from app.routes.portfolio import router as portfolio_router
 from app.routes.transactions import router as transactions_router
 from app.routes.settings import router as settings_router
+from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Virtual Trading Platform")
+
+app = FastAPI(title="backend")
 
 Base.metadata.create_all(bind=engine)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(auth_router)
 app.include_router(test_router)

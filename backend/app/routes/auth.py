@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.database import SessionLocal
 from app.models.user import User
-from app.schemas.user import UserCreate
+from app.schemas.user import UserCreate, UserLogin
 from app.core.security import hash_password, verify_password, create_access_token
 from app.models.portfolio import Portfolio
 
@@ -44,20 +44,70 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
     return {"message": "User created successfully"}
 
 
-
 @router.post("/login")
-def login(
+def login(user: UserLogin, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(
+        User.email == user.email
+    ).first()
+
+    if not db_user or not verify_password(
+        user.password,
+        db_user.password_hash
+    ):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials"
+        )
+
+    access_token = create_access_token(
+        data={"user_id": db_user.id}
+    )
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
+
+# @router.post("/login")
+# def login(
+#     form_data: OAuth2PasswordRequestForm = Depends(),
+#     db: Session = Depends(get_db)
+# ):
+#     # OAuth2 uses "username", we treat it as email
+#     email = form_data.username
+#     password = form_data.password
+
+#     db_user = db.query(User).filter(User.email == email).first()
+
+#     if not db_user or not verify_password(password, db_user.password_hash):
+#         raise HTTPException(status_code=401, detail="Invalid credentials")
+
+#     access_token = create_access_token(
+#         data={"user_id": db_user.id}
+#     )
+
+#     return {
+#         "access_token": access_token,
+#         "token_type": "bearer"
+#     }
+
+@router.post("/token")
+def token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
-    # OAuth2 uses "username", we treat it as email
-    email = form_data.username
-    password = form_data.password
+    db_user = db.query(User).filter(
+        User.email == form_data.username
+    ).first()
 
-    db_user = db.query(User).filter(User.email == email).first()
-
-    if not db_user or not verify_password(password, db_user.password_hash):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    if not db_user or not verify_password(
+        form_data.password,
+        db_user.password_hash
+    ):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials"
+        )
 
     access_token = create_access_token(
         data={"user_id": db_user.id}
