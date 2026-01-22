@@ -4,11 +4,10 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Virtual environment
 venv/
 
-# Environment variables
 .env
 
-# OS
 .DS_Store
+
+node_modules/
