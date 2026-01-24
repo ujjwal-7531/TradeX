@@ -15,7 +15,6 @@ function Dashboard() {
 
   const [data, setData] = useState(null);
   const [transactions, setTransactions] = useState([]);
-
   useEffect(() => {
     fetchPortfolioSummary().then(setData);
     fetchTransactions(10, 0).then(setTransactions);
@@ -25,6 +24,19 @@ function Dashboard() {
     fetchPortfolioSummary().then(setData);
     fetchTransactions(10, 0).then(setTransactions);
   };
+
+  // buy sell wiring
+  const [selectedSymbol, setSelectedSymbol] = useState("");
+  const [selectedTradeType, setSelectedTradeType] = useState(null);
+  const handleHoldingAction = (symbol, type) => {
+    console.log("Holding action:", symbol, type);
+    setSelectedSymbol(symbol);
+    setSelectedTradeType(type);
+  };
+
+
+
+  
 
   const handleLogout = () => {
     removeToken();
@@ -53,15 +65,24 @@ function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
         <BuySellCard
           type="BUY"
+          active={selectedTradeType === "BUY"}
+          presetSymbol={selectedSymbol}
           onSuccess={refreshData}
         />
+
         <BuySellCard
           type="SELL"
+          active={selectedTradeType === "SELL"}
+          presetSymbol={selectedSymbol}
           onSuccess={refreshData}
         />
       </div>
 
-      <HoldingsTable holdings={data.holdings} />
+      <HoldingsTable
+        holdings={data.holdings}
+        onAction={handleHoldingAction}
+      />
+
       <TransactionsTable transactions={transactions} />
     </div>
   );

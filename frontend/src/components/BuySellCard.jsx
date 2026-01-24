@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../api/axios";
 
-function BuySellCard({ type, onSuccess }) {
+function BuySellCard({ type, presetSymbol, active, onSuccess }) {
   const [symbol, setSymbol] = useState("");
   const [quantity, setQuantity] = useState("");
   const [error, setError] = useState("");
@@ -33,7 +33,7 @@ function BuySellCard({ type, onSuccess }) {
   };
 
   return (
-    <div className="bg-white rounded shadow p-5">
+    <div className={`bg-white rounded shadow p-5 ${ active ? "ring-2 ring-blue-500" : ""}`}>
       <h3
         className={`text-lg font-semibold mb-4 ${
           isBuy ? "text-green-600" : "text-red-600"

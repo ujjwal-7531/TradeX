@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function HoldingsTable({ holdings }) {
+function HoldingsTable({ holdings, onAction }) {
   const [openMenu, setOpenMenu] = useState(null);
 
   if (!holdings || holdings.length === 0) {
@@ -65,32 +65,33 @@ function HoldingsTable({ holdings }) {
                       <button
                         className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
                         onClick={() => {
-                          console.log("BUY", h.symbol);
+                          onAction(h.symbol, "BUY");
                           setOpenMenu(null);
                         }}
                       >
-                        Buy
+                      Buy
                       </button>
 
                       <button
                         className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
                         onClick={() => {
-                          console.log("SELL", h.symbol);
+                          onAction(h.symbol, "SELL");
                           setOpenMenu(null);
                         }}
                       >
-                        Sell
-                      </button>
+                      Sell
+                    </button>
+                    
+                    <button
+                      className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
+                      onClick={() => {
+                        console.log("VIEW CHART", h.symbol);
+                        setOpenMenu(null);
+                      }}
+                    >
+                    View Chart
+                    </button>
 
-                      <button
-                        className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
-                        onClick={() => {
-                          console.log("CHART", h.symbol);
-                          setOpenMenu(null);
-                        }}
-                      >
-                        View Chart
-                      </button>
                     </div>
                   )}
                 </td>
