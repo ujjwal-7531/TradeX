@@ -43,7 +43,7 @@ def buy_stock(
             detail="Stock not found"
         )
         
-    price = price = Decimal(str(get_stock_price(symbol)))
+    price = Decimal(str(get_stock_price(symbol)))
 
 
     if price <= 0:
@@ -102,10 +102,9 @@ def buy_stock(
     transaction = Transaction(
         user_id=user_id,
         stock_id=stock.id,
-        trade_type="BUY",
+        trade_type="BUY",  
         quantity=data.quantity,
-        price=price,
-        total_value=total_cost
+        price=price
     )
 
     db.add(transaction)
@@ -191,11 +190,11 @@ def sell_stock(
     transaction = Transaction(
         user_id=user_id,
         stock_id=stock.id,
-        trade_type="SELL",
+        trade_type="SELL",  
         quantity=data.quantity,
-        price=sell_price,
-        total_value=sell_value
+        price=sell_price
     )
+
 
     db.add(transaction)
 

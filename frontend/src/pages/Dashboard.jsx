@@ -1,41 +1,53 @@
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { fetchPortfolioSummary } from "../api/portfolio";
+import PortfolioSummary from "../components/PortfolioSummary";
+import HoldingsTable from "../components/HoldingsTable";
 import { removeToken } from "../utils/auth";
+import { useNavigate } from "react-router-dom";
+import { fetchTransactions } from "../api/transactions";
+import TransactionsTable from "../components/TransactionsTable";
+
 
 function Dashboard() {
   const navigate = useNavigate();
+
+  const [data, setData] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    fetchPortfolioSummary().then(setData);
+    fetchTransactions(10, 0).then(setTransactions);
+  }, []);
+
+  useEffect(() => {
+    fetchPortfolioSummary().then(setData);
+  }, []);
 
   const handleLogout = () => {
     removeToken();
     navigate("/login");
   };
 
-  return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* Header */}
-      <div className="bg-white shadow px-6 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-gray-800">
-          TradeX Dashboard
-        </h1>
+  if (!data) {
+    return <p className="p-6 text-gray-500">Loading dashboard...</p>;
+  }
 
+  return (
+    <div className="min-h-screen bg-gray-100 p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Dashboard</h1>
         <button
           onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-2 rounded"
+          className="text-sm text-red-600"
         >
           Logout
         </button>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 p-6">
-        <div className="bg-white p-6 rounded shadow">
-          <p className="text-gray-700">
-            Welcome to your dashboard 🚀
-          </p>
-          <p className="text-sm text-gray-500 mt-2">
-            Portfolio, trades, and watchlists will appear here.
-          </p>
-        </div>
-      </div>
+      <PortfolioSummary />
+
+      <HoldingsTable holdings={data.holdings} />
+      <TransactionsTable transactions={transactions} />
     </div>
   );
 }

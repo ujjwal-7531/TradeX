@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { setToken } from "../utils/auth";
 
@@ -7,6 +8,8 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,6 +23,7 @@ function Login() {
       });
 
       setToken(res.data.access_token);
+      navigate("/dashboard"); // 👈 THIS WAS MISSING
       alert("Login successful");
     } catch (err) {
       setError("Invalid email or password");

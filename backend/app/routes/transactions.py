@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-
+from datetime import timezone
 from app.database import SessionLocal
 from app.core.dependencies import get_current_user_id
 
@@ -59,8 +59,9 @@ def get_transactions(
             "trade_type": txn.trade_type,
             "quantity": txn.quantity,
             "price": txn.price,
-            "total_value": txn.total_value,
-            "created_at": txn.created_at
+            # "total_value": txn.total_value,
+            "created_at": txn.created_at.replace(tzinfo=timezone.utc).isoformat()
+
         })
 
     return result
