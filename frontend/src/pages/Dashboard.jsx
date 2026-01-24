@@ -6,6 +6,8 @@ import { removeToken } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 import { fetchTransactions } from "../api/transactions";
 import TransactionsTable from "../components/TransactionsTable";
+import BuySellCard from "../components/BuySellCard";
+
 
 
 function Dashboard() {
@@ -19,9 +21,10 @@ function Dashboard() {
     fetchTransactions(10, 0).then(setTransactions);
   }, []);
 
-  useEffect(() => {
+  const refreshData = () => {
     fetchPortfolioSummary().then(setData);
-  }, []);
+    fetchTransactions(10, 0).then(setTransactions);
+  };
 
   const handleLogout = () => {
     removeToken();
@@ -45,6 +48,18 @@ function Dashboard() {
       </div>
 
       <PortfolioSummary />
+
+      {/* Buy / Sell */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <BuySellCard
+          type="BUY"
+          onSuccess={refreshData}
+        />
+        <BuySellCard
+          type="SELL"
+          onSuccess={refreshData}
+        />
+      </div>
 
       <HoldingsTable holdings={data.holdings} />
       <TransactionsTable transactions={transactions} />

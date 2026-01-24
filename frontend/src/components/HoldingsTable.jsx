@@ -1,4 +1,8 @@
+import { useState } from "react";
+
 function HoldingsTable({ holdings }) {
+  const [openMenu, setOpenMenu] = useState(null);
+
   if (!holdings || holdings.length === 0) {
     return (
       <div className="bg-white p-6 rounded shadow mt-6">
@@ -23,6 +27,8 @@ function HoldingsTable({ holdings }) {
             <th className="pb-2">Invested</th>
             <th className="pb-2">Current Value</th>
             <th className="pb-2">P&L</th>
+            <th className="pb-2"></th>
+
           </tr>
         </thead>
 
@@ -44,7 +50,52 @@ function HoldingsTable({ holdings }) {
                 <td className={pnlColor}>
                   ₹ {h.unrealized_pnl.toFixed(2)}
                 </td>
+                <td className="relative">
+                  <button
+                    onClick={() =>
+                      setOpenMenu(openMenu === h.symbol ? null : h.symbol)
+                    }
+                    className="px-2 py-1 hover:bg-gray-200 rounded"
+                  >
+                    ⋮
+                  </button>
+
+                  {openMenu === h.symbol && (
+                    <div className="absolute right-0 mt-1 w-32 bg-white border rounded shadow z-10">
+                      <button
+                        className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
+                        onClick={() => {
+                          console.log("BUY", h.symbol);
+                          setOpenMenu(null);
+                        }}
+                      >
+                        Buy
+                      </button>
+
+                      <button
+                        className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
+                        onClick={() => {
+                          console.log("SELL", h.symbol);
+                          setOpenMenu(null);
+                        }}
+                      >
+                        Sell
+                      </button>
+
+                      <button
+                        className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
+                        onClick={() => {
+                          console.log("CHART", h.symbol);
+                          setOpenMenu(null);
+                        }}
+                      >
+                        View Chart
+                      </button>
+                    </div>
+                  )}
+                </td>
               </tr>
+              
             );
           })}
         </tbody>
