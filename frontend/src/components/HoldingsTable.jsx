@@ -6,18 +6,16 @@ function HoldingsTable({ holdings, onAction }) {
   if (!holdings || holdings.length === 0) {
     return (
       <div className="bg-white p-6 rounded shadow mt-6">
-        <p className="text-gray-500 text-sm">
-          You do not own any stocks yet.
-        </p>
+        <p className="text-gray-500 text-sm">You do not own any stocks yet.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white p-6 rounded shadow mt-6 overflow-x-auto">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded shadow mt-6 overflow-x-auto">
       <h3 className="text-lg font-semibold mb-4">Your Holdings</h3>
 
-      <table className="w-full text-sm border-collapse">
+      <table className="w-full text-sm border-collapse text-black dark:text-gray-200">
         <thead>
           <tr className="text-left border-b">
             <th className="pb-2">Symbol</th>
@@ -28,16 +26,13 @@ function HoldingsTable({ holdings, onAction }) {
             <th className="pb-2">Current Value</th>
             <th className="pb-2">P&L</th>
             <th className="pb-2"></th>
-
           </tr>
         </thead>
 
         <tbody>
           {holdings.map((h) => {
             const pnlColor =
-              h.unrealized_pnl >= 0
-                ? "text-green-600"
-                : "text-red-600";
+              h.unrealized_pnl >= 0 ? "text-green-600" : "text-red-600";
 
             return (
               <tr key={h.symbol} className="border-b last:border-b-0">
@@ -47,9 +42,7 @@ function HoldingsTable({ holdings, onAction }) {
                 <td>₹ {h.current_price.toFixed(2)}</td>
                 <td>₹ {h.invested_value.toFixed(2)}</td>
                 <td>₹ {h.current_value.toFixed(2)}</td>
-                <td className={pnlColor}>
-                  ₹ {h.unrealized_pnl.toFixed(2)}
-                </td>
+                <td className={pnlColor}>₹ {h.unrealized_pnl.toFixed(2)}</td>
                 <td className="relative">
                   <button
                     onClick={() =>
@@ -61,42 +54,52 @@ function HoldingsTable({ holdings, onAction }) {
                   </button>
 
                   {openMenu === h.symbol && (
-                    <div className="absolute right-0 mt-1 w-32 bg-white border rounded shadow z-10">
+                    <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow z-10">
                       <button
-                        className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
+                        className="
+    block w-full text-left px-3 py-2 text-sm
+    text-gray-800 dark:text-gray-200
+    hover:bg-gray-100 dark:hover:bg-gray-700
+  "
                         onClick={() => {
                           onAction(h.symbol, "BUY");
                           setOpenMenu(null);
                         }}
                       >
-                      Buy
+                        Buy
                       </button>
 
                       <button
-                        className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
+                        className="
+    block w-full text-left px-3 py-2 text-sm
+    text-gray-800 dark:text-gray-200
+    hover:bg-gray-100 dark:hover:bg-gray-700
+  "
                         onClick={() => {
                           onAction(h.symbol, "SELL");
                           setOpenMenu(null);
                         }}
                       >
-                      Sell
-                    </button>
+                        Sell
+                      </button>
 
-                    <button
-                      className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
-                      onClick={() => {
-                        onAction(h.symbol, "CHART");
-                        setOpenMenu(null);
-                      }}
-                    >
-                      View Chart
-                    </button>
-
+                      <button
+                        className="
+    block w-full text-left px-3 py-2 text-sm
+    text-gray-800 dark:text-gray-200
+    hover:bg-gray-100 dark:hover:bg-gray-700
+  "
+                        onClick={() => {
+                          onAction(h.symbol, "CHART");
+                          setOpenMenu(null);
+                        }}
+                      >
+                        View Chart
+                      </button>
                     </div>
                   )}
                 </td>
               </tr>
-              
             );
           })}
         </tbody>

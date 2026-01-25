@@ -3,11 +3,9 @@ import { fetchPortfolioSummary } from "../api/portfolio";
 
 function StatCard({ title, value, valueClass = "" }) {
   return (
-    <div className="bg-white rounded shadow p-4">
-      <p className="text-sm text-gray-500">{title}</p>
-      <p className={`text-xl font-semibold mt-1 ${valueClass}`}>
-        {value}
-      </p>
+    <div className="bg-white dark:bg-gray-800 rounded shadow p-4">
+      <p className="text-sm text-gray-500 dark:text-gray-400">{title}</p>
+      <p className={`text-xl font-semibold mt-1 ${valueClass}`}>{value}</p>
     </div>
   );
 }
@@ -30,8 +28,12 @@ function PortfolioSummary() {
     return <p className="text-gray-500">Loading portfolio...</p>;
   }
 
-  const pnlColor =data.total_unrealized_pnl >= 0 ? "text-green-600" : "text-red-600";
-  const pnl_percentage = data.total_invested > 0 ? ((data.total_unrealized_pnl * 100) / data.total_invested).toFixed(2) : 0.00
+  const pnlColor =
+    data.total_unrealized_pnl >= 0 ? "text-green-600" : "text-red-600";
+  const pnl_percentage =
+    data.total_invested > 0
+      ? ((data.total_unrealized_pnl * 100) / data.total_invested).toFixed(2)
+      : 0.0;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -10,14 +10,14 @@ function TransactionsTable({ transactions }) {
   }
 
   return (
-    <div className="bg-white p-6 rounded shadow mt-6 overflow-x-auto">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded shadow mt-6 overflow-x-auto">
       <h3 className="text-lg font-semibold mb-4">
         Recent Transactions
       </h3>
 
-      <table className="w-full text-sm border-collapse">
+      <table className="w-full text-sm border-collapse text-black dark:text-gray-200">
         <thead>
-          <tr className="text-left border-b">
+          <tr className="text-left border-b border-gray-200 dark:border-gray-700">
             <th className="pb-2">Type</th>
             <th className="pb-2">Symbol</th>
             <th className="pb-2">Qty</th>
@@ -42,7 +42,7 @@ function TransactionsTable({ transactions }) {
                 <td>{tx.quantity}</td>
                 <td>₹ {tx.price.toFixed(2)}</td>
                 <td className="text-gray-500">
-                  {new Date(tx.created_at).toLocaleString("en-IN", {timeZone: "Asia/Kolkata"})}
+                  {new Date(tx.created_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
                 </td>
               </tr>
             );

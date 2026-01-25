@@ -10,7 +10,6 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -35,14 +34,10 @@ function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-sm bg-white rounded-lg shadow p-6">
-        <h1 className="text-2xl font-semibold text-center mb-6">
-          Login
-        </h1>
+        <h1 className="text-2xl font-semibold text-center mb-6">Login</h1>
 
         {error && (
-          <div className="mb-4 text-sm text-red-600 text-center">
-            {error}
-          </div>
+          <div className="mb-4 text-sm text-red-600 text-center">{error}</div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">

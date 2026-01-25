@@ -8,11 +8,25 @@ import { fetchTransactions } from "../api/transactions";
 import TransactionsTable from "../components/TransactionsTable";
 import BuySellCard from "../components/BuySellCard";
 import TradingViewChart from "../components/TradingViewChart";
+import TopBar from "../components/TopBar";
 
 
 
 function Dashboard() {
   const navigate = useNavigate();
+  const [tradeOpen, setTradeOpen] = useState(false);
+  const [tradeType, setTradeType] = useState(null); // "BUY" | "SELL"
+  const [tradeSymbol, setTradeSymbol] = useState("");
+
+  const [isDark, setIsDark] = useState(
+    document.documentElement.classList.contains("dark")
+  );
+
+  const toggleTheme = () => {
+    document.documentElement.classList.toggle("dark");
+    setIsDark(!isDark);
+  };
+
 
   const [data, setData] = useState(null);
   const [transactions, setTransactions] = useState([]);
@@ -32,19 +46,19 @@ function Dashboard() {
 
   const handleHoldingAction = (symbol, type) => {
     if (type === "BUY" || type === "SELL") {
-      setSelectedSymbol(symbol);
-      setSelectedTradeType(type);
+      setTradeSymbol(symbol);
+      setTradeType(type);
+      setTradeOpen(true);
     }
+
     if (type === "CHART") {
       setChartSymbol(symbol);
-  }
-};
-
-
+    }
+  };
 
   // chart 
   const [chartSymbol, setChartSymbol] = useState(null);
-  
+
 
   const handleLogout = () => {
     removeToken();
@@ -56,51 +70,45 @@ function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <button
-          onClick={handleLogout}
-          className="text-sm text-red-600"
-        >
-          Logout
-        </button>
-      </div>
-
-      <PortfolioSummary />
-
-      {/* Buy / Sell */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <BuySellCard
-          type="BUY"
-          active={selectedTradeType === "BUY"}
-          presetSymbol={selectedSymbol}
-          onSuccess={refreshData}
-        />
-
-        <BuySellCard
-          type="SELL"
-          active={selectedTradeType === "SELL"}
-          presetSymbol={selectedSymbol}
-          onSuccess={refreshData}
-        />
-      </div>
-
-      {chartSymbol && (
-        <TradingViewChart
-          symbol={chartSymbol}
-          onClose={() => setChartSymbol(null)}
-        />
-      )}
-
-      <HoldingsTable
-        holdings={data.holdings}
-        onAction={handleHoldingAction}
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+      <TopBar
+        email="user@example.com"
+        onLogout={handleLogout}
+        onToggleTheme={toggleTheme}
+        isDark={isDark}
       />
 
-      <TransactionsTable transactions={transactions} />
+
+      <div className="p-6 text-black dark:text-white">
+        <PortfolioSummary />
+        {chartSymbol && (
+          <TradingViewChart
+            symbol={chartSymbol}
+            onClose={() => setChartSymbol(null)}
+          />
+        )}
+        {tradeOpen && (
+          <BuySellCard
+            type={tradeType}
+            symbol={tradeSymbol}
+            onClose={() => setTradeOpen(false)}
+            onSuccess={() => {
+              setTradeOpen(false);
+              refreshData();
+            }}
+          />
+        )}
+        <HoldingsTable
+          holdings={data.holdings}
+          onAction={handleHoldingAction}
+        />
+
+        <TransactionsTable transactions={transactions} />
+      </div>
     </div>
   );
+
+
 }
 
 export default Dashboard;

@@ -42,9 +42,7 @@ function Signup() {
         </h1>
 
         {error && (
-          <div className="mb-4 text-sm text-red-600 text-center">
-            {error}
-          </div>
+          <div className="mb-4 text-sm text-red-600 text-center">{error}</div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">

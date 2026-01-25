@@ -1,13 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../api/axios";
 
-function BuySellCard({ type, presetSymbol, active, onSuccess }) {
-  const [symbol, setSymbol] = useState("");
+function BuySellCard({ type, symbol, onClose, onSuccess }) {
+  const isBuy = type === "BUY";
+
+  // 🔹 local state
+  const [inputSymbol, setInputSymbol] = useState(symbol || "");
   const [quantity, setQuantity] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const isBuy = type === "BUY";
+  // 🔹 auto-fill symbol when user clicks Buy/Sell from holdings
+  useEffect(() => {
+    if (symbol) {
+      setInputSymbol(symbol);
+    }
+  }, [symbol]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,24 +24,32 @@ function BuySellCard({ type, presetSymbol, active, onSuccess }) {
 
     try {
       await api.post(`/trade/${isBuy ? "buy" : "sell"}`, {
-        symbol: symbol.toUpperCase(),
+        symbol: inputSymbol.toUpperCase(),
         quantity: Number(quantity),
       });
 
-      setSymbol("");
       setQuantity("");
       onSuccess?.();
     } catch (err) {
-      setError(
-        err.response?.data?.detail || "Trade failed"
-      );
+      setError(err.response?.data?.detail || "Trade failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className={`bg-white rounded shadow p-5 ${ active ? "ring-2 ring-blue-500" : ""}`}>
+    <div
+      className={`relative bg-white dark:bg-gray-800 text-black dark:text-white rounded shadow p-5
+        ${isBuy ? "ring-2 ring-green-500" : "ring-2 ring-red-500"}`}
+    >
+      {/* ❌ Close */}
+      <button
+        onClick={onClose}
+        className="absolute top-2 right-2 text-gray-400 hover:text-red-500"
+      >
+        ✕
+      </button>
+
       <h3
         className={`text-lg font-semibold mb-4 ${
           isBuy ? "text-green-600" : "text-red-600"
@@ -42,18 +58,14 @@ function BuySellCard({ type, presetSymbol, active, onSuccess }) {
         {isBuy ? "Buy Stock" : "Sell Stock"}
       </h3>
 
-      {error && (
-        <p className="text-red-500 text-sm mb-2">
-          {error}
-        </p>
-      )}
+      {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <input
           type="text"
           placeholder="Symbol (e.g. TCS)"
-          value={symbol}
-          onChange={(e) => setSymbol(e.target.value)}
+          value={inputSymbol}
+          onChange={(e) => setInputSymbol(e.target.value)}
           className="w-full border rounded px-3 py-2"
           required
         />

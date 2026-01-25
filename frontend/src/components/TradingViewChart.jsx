@@ -1,12 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 function TradingViewChart({ symbol, onClose }) {
+  const containerRef = useRef(null);
+
   useEffect(() => {
     if (!symbol) return;
 
-    const containerId = "tradingview_container";
-
-    document.getElementById(containerId).innerHTML = "";
+    containerRef.current.innerHTML = "";
 
     const script = document.createElement("script");
     script.src = "https://s3.tradingview.com/tv.js";
@@ -22,35 +22,31 @@ function TradingViewChart({ symbol, onClose }) {
         theme: "light",
         style: "1",
         locale: "en",
-        toolbar_bg: "#f1f3f6",
-        enable_publishing: false,
         hide_top_toolbar: true,
-        container_id: containerId,
+        enable_publishing: false,
+        container_id: containerRef.current.id,
       });
     };
 
-    document.body.appendChild(script);
+    containerRef.current.appendChild(script);
   }, [symbol]);
 
   return (
-    <div className="bg-white rounded shadow p-4 mt-6 relative">
+    <div className="bg-white dark:bg-gray-800 rounded shadow p-4 mt-6">
       <div className="flex justify-between items-center mb-2">
-        <h3 className="text-lg font-semibold">
-          {symbol} Chart
-        </h3>
+        <h3 className="text-lg font-semibold">{symbol} Chart</h3>
 
         <button
           onClick={onClose}
-          className="text-gray-500 hover:text-gray-800 text-sm"
+          className="text-sm text-gray-500 hover:text-red-600"
         >
           ✕
         </button>
       </div>
 
-      <div id="tradingview_container" />
+      <div id={`tv-chart-${symbol}`} ref={containerRef} />
     </div>
   );
-
 }
 
 export default TradingViewChart;
