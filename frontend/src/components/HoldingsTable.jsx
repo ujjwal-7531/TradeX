@@ -81,15 +81,15 @@ function HoldingsTable({ holdings, onAction }) {
                       >
                       Sell
                     </button>
-                    
+
                     <button
                       className="block w-full text-left px-3 py-2 hover:bg-gray-100 text-sm"
                       onClick={() => {
-                        console.log("VIEW CHART", h.symbol);
+                        onAction(h.symbol, "CHART");
                         setOpenMenu(null);
                       }}
                     >
-                    View Chart
+                      View Chart
                     </button>
 
                     </div>

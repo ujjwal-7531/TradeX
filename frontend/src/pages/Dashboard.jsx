@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchTransactions } from "../api/transactions";
 import TransactionsTable from "../components/TransactionsTable";
 import BuySellCard from "../components/BuySellCard";
+import TradingViewChart from "../components/TradingViewChart";
 
 
 
@@ -28,14 +29,21 @@ function Dashboard() {
   // buy sell wiring
   const [selectedSymbol, setSelectedSymbol] = useState("");
   const [selectedTradeType, setSelectedTradeType] = useState(null);
+
   const handleHoldingAction = (symbol, type) => {
-    console.log("Holding action:", symbol, type);
-    setSelectedSymbol(symbol);
-    setSelectedTradeType(type);
-  };
+    if (type === "BUY" || type === "SELL") {
+      setSelectedSymbol(symbol);
+      setSelectedTradeType(type);
+    }
+    if (type === "CHART") {
+      setChartSymbol(symbol);
+  }
+};
 
 
 
+  // chart 
+  const [chartSymbol, setChartSymbol] = useState(null);
   
 
   const handleLogout = () => {
@@ -77,6 +85,13 @@ function Dashboard() {
           onSuccess={refreshData}
         />
       </div>
+
+      {chartSymbol && (
+        <TradingViewChart
+          symbol={chartSymbol}
+          onClose={() => setChartSymbol(null)}
+        />
+      )}
 
       <HoldingsTable
         holdings={data.holdings}
