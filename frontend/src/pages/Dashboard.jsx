@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchPortfolioSummary } from "../api/portfolio";
 import PortfolioSummary from "../components/PortfolioSummary";
-import HoldingsTable from "../components/HoldingsTable";
 import { removeToken } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 import { fetchTransactions } from "../api/transactions";
@@ -21,6 +20,11 @@ function Dashboard() {
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
   );
+  useEffect(() => {
+    fetchPortfolioSummary().then(setData);
+    // Only fetch a small preview (last 5) for the dashboard
+    fetchTransactions(5, 0).then(setTransactions);
+  }, []);
 
   const toggleTheme = () => {
     document.documentElement.classList.toggle("dark");
@@ -72,10 +76,11 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       <TopBar
-        email="user@example.com"
+        email="user@example.com" // You can replace this with real user data later
         onLogout={handleLogout}
         onToggleTheme={toggleTheme}
         isDark={isDark}
+        refreshData={refreshData} // This is the key!
       />
 
 
@@ -98,12 +103,19 @@ function Dashboard() {
             }}
           />
         )}
-        <HoldingsTable
-          holdings={data.holdings}
-          onAction={handleHoldingAction}
-        />
 
-        <TransactionsTable transactions={transactions} />
+        <div className="mt-8">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold">Recent Transactions</h3>
+            <button 
+              onClick={() => navigate("/transactions")}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              View All
+            </button>
+          </div>
+          <TransactionsTable transactions={transactions} />
+        </div>
       </div>
     </div>
   );
