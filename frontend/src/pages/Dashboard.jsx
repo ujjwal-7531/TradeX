@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+
 import { fetchPortfolioSummary } from "../api/portfolio";
 import PortfolioSummary from "../components/PortfolioSummary";
+
 import { removeToken } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 import { fetchTransactions } from "../api/transactions";
@@ -8,6 +10,7 @@ import TransactionsTable from "../components/TransactionsTable";
 import BuySellCard from "../components/BuySellCard";
 import TradingViewChart from "../components/TradingViewChart";
 import TopBar from "../components/TopBar";
+import MarketOverviewWidget from "../components/MarketOverviewWidget"; //for market overview widget
 
 
 
@@ -34,15 +37,15 @@ function Dashboard() {
 
   const [data, setData] = useState(null);
   const [transactions, setTransactions] = useState([]);
-  useEffect(() => {
-    fetchPortfolioSummary().then(setData);
-    fetchTransactions(10, 0).then(setTransactions);
-  }, []);
-
   const refreshData = () => {
     fetchPortfolioSummary().then(setData);
     fetchTransactions(10, 0).then(setTransactions);
   };
+
+  // 2. SINGLE EFFECT ON MOUNT
+  useEffect(() => {
+    refreshData();
+  }, []);
 
   // buy sell wiring
   const [selectedSymbol, setSelectedSymbol] = useState("");
@@ -85,7 +88,13 @@ function Dashboard() {
 
 
       <div className="p-6 text-black dark:text-white">
-        <PortfolioSummary />
+        {/*portfolio summary*/}
+        <PortfolioSummary data={data} />
+
+        {/* market overview widget*/}
+        <MarketOverviewWidget isDark={isDark} />
+
+
         {chartSymbol && (
           <TradingViewChart
             symbol={chartSymbol}
@@ -103,19 +112,6 @@ function Dashboard() {
             }}
           />
         )}
-
-        <div className="mt-8">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Recent Transactions</h3>
-            <button 
-              onClick={() => navigate("/transactions")}
-              className="text-sm text-blue-600 hover:underline"
-            >
-              View All
-            </button>
-          </div>
-          <TransactionsTable transactions={transactions} />
-        </div>
       </div>
     </div>
   );

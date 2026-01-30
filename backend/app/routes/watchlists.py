@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from typing import List
 
 from app.database import SessionLocal
 from app.models.watchlist import Watchlist
@@ -20,25 +21,34 @@ def get_db():
     finally:
         db.close()
         
-@router.post("")
-def create_watchlist(
-    data: WatchlistCreate,
+# 1. ACTUAL GET ROUTE: Fetch all watchlists for the logged-in user
+@router.get("", response_model=List[dict])
+def get_all_watchlists(
     user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
 ):
-    watchlist = Watchlist(
-        name=data.name,
-        user_id=user_id
-    )
+    # Just fetch data, no body required!
+    watchlists = db.query(Watchlist).filter(Watchlist.user_id == user_id).all()
+    return [{"id": w.id, "name": w.name} for w in watchlists]
 
+# 2. ACTUAL POST ROUTE: Create a new watchlist with the 10-limit check
+@router.post("", response_model=dict)
+def create_watchlist(
+    data: WatchlistCreate, # Body is allowed here
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    # Enforce the 10-watchlist limit
+    count = db.query(Watchlist).filter(Watchlist.user_id == user_id).count()
+    if count >= 10:
+        raise HTTPException(status_code=400, detail="Maximum limit of 10 watchlists reached.")
+
+    watchlist = Watchlist(name=data.name, user_id=user_id)
     db.add(watchlist)
     db.commit()
     db.refresh(watchlist)
-
-    return {
-        "id": watchlist.id,
-        "name": watchlist.name
-    }
+    
+    return {"id": watchlist.id, "name": watchlist.name}
 
 
 
@@ -151,3 +161,24 @@ def get_watchlist(
         "watchlist": watchlist.name,
         "stocks": result
     }
+    
+# 3. NEW: Delete Entire Watchlist
+@router.delete("/{watchlist_id}")
+def delete_watchlist(
+    watchlist_id: int,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    watchlist = db.query(Watchlist).filter(
+        Watchlist.id == watchlist_id, 
+        Watchlist.user_id == user_id
+    ).first()
+
+    if not watchlist:
+        raise HTTPException(status_code=404, detail="Watchlist not found")
+
+    # This will remove the watchlist. (Note: Ensure your DB schema has 
+    # cascade delete on watchlist_stocks, or delete them manually first)
+    db.delete(watchlist)
+    db.commit()
+    return {"message": "Watchlist deleted successfully"}

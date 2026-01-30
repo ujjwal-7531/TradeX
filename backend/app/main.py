@@ -14,6 +14,9 @@ from app.routes.portfolio import router as portfolio_router
 from app.routes.transactions import router as transactions_router
 from app.routes.settings import router as settings_router
 from fastapi.middleware.cors import CORSMiddleware
+from app.routes import watchlists, stocks  # Import your new stocks router
+
+
 
 
 app = FastAPI(title="backend")
@@ -38,6 +41,8 @@ app.include_router(trade_router)
 app.include_router(portfolio_router)
 app.include_router(transactions_router)
 app.include_router(settings_router)
+app.include_router(watchlists.router)
+app.include_router(stocks.router)  # Add this line
 
 @app.get("/")
 def root():

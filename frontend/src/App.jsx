@@ -10,6 +10,7 @@ import Transactions from "./pages/Transactions"; // Import the new page
 import HoldingsTable from "./components/HoldingsTable";
 import TransactionsTable from "./components/TransactionsTable";
 import Holdings from "./pages/Holdings"; // Import the new page
+import Watchlist from "./pages/Watchlist"
 
 function App() {
   return (
@@ -40,11 +41,14 @@ function App() {
           </ProtectedRoute>
         } />
 
-        <Route path="/watchlist" element={
-          <ProtectedRoute>
-            <div className="p-6 text-white text-2xl">Watchlist Page (Coming Soon)</div>
-          </ProtectedRoute>
-        } />
+        <Route 
+  path="/watchlist" 
+  element={
+    <ProtectedRoute>
+      <Watchlist />
+    </ProtectedRoute>
+  } 
+/>
       </Routes>
     </BrowserRouter>
   );
