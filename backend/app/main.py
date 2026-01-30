@@ -16,9 +16,6 @@ from app.routes.settings import router as settings_router
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import watchlists, stocks  # Import your new stocks router
 
-
-
-
 app = FastAPI(title="backend")
 
 Base.metadata.create_all(bind=engine)

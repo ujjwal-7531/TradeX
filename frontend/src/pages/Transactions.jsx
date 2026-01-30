@@ -21,6 +21,7 @@ function Transactions() {
     document.documentElement.classList.toggle("dark");
     setIsDark(!isDark);
   };
+  
 
   // 2. Add limit to the dependency array so it refetches when changed
   useEffect(() => {

@@ -50,50 +50,38 @@ def create_watchlist(
     
     return {"id": watchlist.id, "name": watchlist.name}
 
-
-
 @router.post("/{watchlist_id}/stocks")
 def add_stock_to_watchlist(
     watchlist_id: int,
-    data: WatchlistStockAdd,
+    data: dict, # Expecting {"symbol": "AAPL"} from the frontend
     user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
 ):
+    # 1. Security check: Does this watchlist belong to the logged-in user?
     watchlist = db.query(Watchlist).filter(
-        Watchlist.id == watchlist_id,
+        Watchlist.id == watchlist_id, 
         Watchlist.user_id == user_id
     ).first()
-
+    
     if not watchlist:
         raise HTTPException(status_code=404, detail="Watchlist not found")
 
-    stock = db.query(Stock).filter(
-        Stock.symbol == data.symbol.upper()
-    ).first()
+    # 2. Find the stock in your 'stocks' table
+    symbol = data.get("symbol", "").upper()
+    stock = db.query(Stock).filter(Stock.symbol == symbol).first()
 
     if not stock:
-        raise HTTPException(status_code=404, detail="Stock not found")
+        raise HTTPException(status_code=404, detail=f"Stock {symbol} not found in database")
 
-    exists = db.query(WatchlistStock).filter(
-        WatchlistStock.watchlist_id == watchlist_id,
-        WatchlistStock.stock_id == stock.id
-    ).first()
+    # 3. Check for duplicates (don't add the same stock twice)
+    if stock in watchlist.stocks:
+        raise HTTPException(status_code=400, detail="Stock is already in this watchlist")
 
-    if exists:
-        raise HTTPException(
-            status_code=400,
-            detail="Stock already in watchlist"
-        )
-
-    watchlist_stock = WatchlistStock(
-        watchlist_id=watchlist_id,
-        stock_id=stock.id
-    )
-
-    db.add(watchlist_stock)
+    # 4. Create the link
+    watchlist.stocks.append(stock)
     db.commit()
 
-    return {"message": "Stock added to watchlist"}
+    return {"message": f"Successfully added {symbol} to {watchlist.name}"}
 
 
 @router.delete("/{watchlist_id}/stocks/{symbol}")
@@ -182,3 +170,5 @@ def delete_watchlist(
     db.delete(watchlist)
     db.commit()
     return {"message": "Watchlist deleted successfully"}
+
+

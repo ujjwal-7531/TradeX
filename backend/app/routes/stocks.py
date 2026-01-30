@@ -4,6 +4,7 @@ from sqlalchemy import or_
 from app.database import SessionLocal
 from app.models.stock import Stock
 from typing import List
+from app.core.dependencies import get_current_user_id
 
 router = APIRouter(prefix="/stocks", tags=["Stocks"])
 
@@ -17,7 +18,8 @@ def get_db():
 @router.get("/search")
 def search_stocks(
     q: str = Query(..., min_length=1), 
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id) # Optional: Adds a layer of security
 ):
     """
     Search stocks by symbol (starting with query) or name (containing query).
@@ -39,4 +41,25 @@ def search_stocks(
             "name": s.name, 
             "exchange": s.exchange
         } for s in stocks
+    ]
+    
+@router.get("/search", response_model=List[dict])
+def search_stocks(
+    q: str = Query(..., min_length=1),
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id)
+):
+    # Search by symbol or name (case-insensitive)
+    search_query = f"%{q}%"
+    results = db.query(Stock).filter(
+        (Stock.symbol.ilike(search_query)) | 
+        (Stock.name.ilike(search_query))
+    ).limit(10).all() # Limit to 10 for performance
+
+    return [
+        {
+            "symbol": s.symbol,
+            "name": s.name,
+            "exchange": s.exchange
+        } for s in results
     ]

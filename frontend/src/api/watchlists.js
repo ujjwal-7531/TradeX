@@ -58,6 +58,7 @@ export const searchStocks = async (query) => {
 
 // Add stock to a specific watchlist
 export const addStockToWatchlist = async (watchlistId, symbol) => {
+  // Matches the @router.post("/{watchlist_id}/stocks") we created
   const res = await api.post(`/watchlists/${watchlistId}/stocks`, { symbol });
   return res.data;
 };
@@ -65,5 +66,11 @@ export const addStockToWatchlist = async (watchlistId, symbol) => {
 // Remove stock from a watchlist
 export const removeStockFromWatchlist = async (watchlistId, symbol) => {
   const res = await api.delete(`/watchlists/${watchlistId}/stocks/${symbol}`);
+  return res.data;
+};
+
+// Add this to your existing api/watchlists.js
+export const fetchWatchlistById = async (id) => {
+  const res = await api.get(`/watchlists/${id}`);
   return res.data;
 };
