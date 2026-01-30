@@ -1,33 +1,39 @@
-from app.database import SessionLocal, engine
+import pandas as pd
+from app.database import SessionLocal
 from app.models.stock import Stock
-
-# Sample Nifty data - You can expand this list or import a CSV
-INITIAL_STOCKS = [
-    {"symbol": "RELIANCE", "name": "Reliance Industries Ltd.", "exchange": "NSE"},
-    {"symbol": "TCS", "name": "Tata Consultancy Services Ltd.", "exchange": "NSE"},
-    {"symbol": "HDFCBANK", "name": "HDFC Bank Ltd.", "exchange": "NSE"},
-    {"symbol": "INFY", "name": "Infosys Ltd.", "exchange": "NSE"},
-    {"symbol": "ICICIBANK", "name": "ICICI Bank Ltd.", "exchange": "NSE"},
-    {"symbol": "SBIN", "name": "State Bank of India", "exchange": "NSE"},
-    {"symbol": "BHARTIARTL", "name": "Bharti Airtel Ltd.", "exchange": "NSE"},
-    {"symbol": "ITC", "name": "ITC Ltd.", "exchange": "NSE"},
-    {"symbol": "WIPRO", "name": "Wipro Ltd.", "exchange": "NSE"},
-    {"symbol": "HINDALCO", "name": "Hindalco Industries Ltd.", "exchange": "NSE"},
-]
+from app.models.watchlist import Watchlist
 
 def seed():
     db = SessionLocal()
     try:
-        for s_data in INITIAL_STOCKS:
-            # Check if stock already exists to avoid duplicates
-            exists = db.query(Stock).filter(Stock.symbol == s_data["symbol"]).first()
-            if not exists:
-                stock = Stock(**s_data)
-                db.add(stock)
-        db.commit()
-        print("Successfully seeded initial stocks!")
+        # Load CSV: 1st col is symbol, 2nd is name
+        df = pd.read_csv("all_companies.csv")
+        df.columns = ['symbol', 'name']
+
+        # Get existing symbols to avoid duplicates
+        existing = {s[0] for s in db.query(Stock.symbol).all()}
+        
+        new_entries = []
+        for _, row in df.iterrows():
+            sym = str(row['symbol']).strip().upper()
+            if sym not in existing:
+                new_entries.append(Stock(
+                    symbol=sym,
+                    name=str(row['name']).strip(),
+                    exchange="NSE/BSE" # Default value
+                ))
+                existing.add(sym)
+
+        if new_entries:
+            db.bulk_save_objects(new_entries)
+            db.commit()
+            print(f"✅ Successfully added {len(new_entries)} stocks.")
+        else:
+            print("ℹ️ No new stocks found to add.")
+            
     except Exception as e:
-        print(f"Error seeding stocks: {e}")
+        print(f"❌ Error: {e}")
+        db.rollback()
     finally:
         db.close()
 

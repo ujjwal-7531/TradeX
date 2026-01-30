@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String, TIMESTAMP, text
+from sqlalchemy import Column, Integer, String, TIMESTAMP, text,ForeignKey, Table
 from app.database import Base
 from sqlalchemy.orm import relationship
 from datetime import datetime
+
 
 class Stock(Base):
     __tablename__ = "stocks"

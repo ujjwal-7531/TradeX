@@ -1,9 +1,24 @@
 import { useState, useEffect } from "react";
+import { removeToken } from "../utils/auth";
 import TopBar from "../components/TopBar";
-import {fetchAllWatchlists,fetchWatchlistDetail,createWatchlist,deleteWatchlist,removeStockFromWatchlist,fetchWatchlistById} from "../api/watchlists";
+import { fetchPortfolioSummary } from "../api/portfolio";
+import { fetchTransactions} from "../api/transactions";
+import {
+  fetchAllWatchlists,
+  fetchWatchlistDetail,
+  createWatchlist,
+  deleteWatchlist,
+  removeStockFromWatchlist,
+  fetchWatchlistById,
+} from "../api/watchlists";
 import StockSearch from "../components/SearchStock";
+import { useNavigate } from "react-router-dom";
+import api from '../api/axios'; // Adjust the path if your axios file is elsewhere
 
 function WatchlistPage() {
+  const [transactions, setTransactions] = useState([]);
+  const [data, setData] = useState(null);
+  const navigate = useNavigate();
   const [watchlists, setWatchlists] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [currentWatchlist, setCurrentWatchlist] = useState(null);
@@ -63,42 +78,43 @@ function WatchlistPage() {
     }
   };
 
-// 1. Define the missing function
-const loadWatchlistDetails = async () => {
-  if (!selectedId) return;
-  try {
-    const data = await fetchWatchlistById(selectedId);
-    setCurrentWatchlist(data);
-  } catch (err) {
-    console.error("Error loading stocks:", err);
-  }
-};
+  // 1. Define the missing function
+  const loadWatchlistDetails = async () => {
+    if (!selectedId) return;
+    try {
+      const data = await fetchWatchlistById(selectedId);
+      setCurrentWatchlist(data);
+    } catch (err) {
+      console.error("Error loading stocks:", err);
+    }
+  };
 
-// 2. Automatically trigger the load when a user clicks a list in the sidebar
-useEffect(() => {
-  if (selectedId) {
-    loadWatchlistDetails();
-  } else {
-    setCurrentWatchlist(null);
-  }
-}, [selectedId]);
+  // 2. Automatically trigger the load when a user clicks a list in the sidebar
+  useEffect(() => {
+    if (selectedId) {
+      loadWatchlistDetails();
+    } else {
+      setCurrentWatchlist(null);
+    }
+  }, [selectedId]);
 
-// 3. Define the handleRemoveStock function (since it's used in your table)
-const handleRemoveStock = async (symbol) => {
-  try {
-    // We'll build this API call next, but for now, it prevents the error
-    await api.delete(`/watchlists/${selectedId}/stocks/${symbol}`);
-    loadWatchlistDetails(); // Refresh list after removal
-  } catch (err) {
-    alert("Failed to remove stock");
-  }
-};
-const handleLogout = () => {
+  // 3. Define the handleRemoveStock function (since it's used in your table)
+  const handleRemoveStock = async (symbol) => {
+    try {
+      await api.delete(`/watchlists/${selectedId}/stocks/${symbol}`);
+      // Refresh the table immediately after removal
+      loadWatchlistDetails();
+    } catch (err) {
+      console.error("Failed to remove stock:", err);
+      alert("Could not remove stock. Please try again.");
+    }
+  };
+  const handleLogout = () => {
     removeToken();
     navigate("/login");
-};
-const [isDark, setIsDark] = useState(
-    document.documentElement.classList.contains("dark")
+  };
+  const [isDark, setIsDark] = useState(
+    document.documentElement.classList.contains("dark"),
   );
 
   const toggleTheme = () => {
@@ -106,9 +122,9 @@ const [isDark, setIsDark] = useState(
     setIsDark(!isDark);
   };
   const refreshData = () => {
-      fetchPortfolioSummary().then(setData);
-      fetchTransactions(10, 0).then(setTransactions);
-    };
+    fetchPortfolioSummary().then(setData);
+    fetchTransactions(10, 0).then(setTransactions);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col">
@@ -237,31 +253,31 @@ const [isDark, setIsDark] = useState(
                         </td>
                       </tr>
                     ) : (
-                      currentWatchlist.stocks.map(stock => (
-  <tr 
-    key={stock.symbol} 
-    // Remove hover:bg-gray-50 if it's causing issues, or strictly define both:
-    className="group transition-colors border-b dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-blue-900/20"
-  >
-    <td className="px-6 py-4 font-bold text-blue-600 dark:text-blue-400">
-      {stock.symbol}
-    </td>
-    <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
-      {stock.name}
-    </td>
-    <td className="px-6 py-4 text-right font-mono font-semibold dark:text-white">
-      ₹{stock.price}
-    </td>
-    <td className="px-6 py-4 text-right">
-      <button 
-        onClick={() => handleRemoveStock(stock.symbol)}
-        className="text-gray-400 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
-      >
-        Remove
-      </button>
-    </td>
-  </tr>
-))
+                      currentWatchlist.stocks.map((stock) => (
+                        <tr
+                          key={stock.symbol}
+                          // Remove hover:bg-gray-50 if it's causing issues, or strictly define both:
+                          className="group transition-colors border-b dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-blue-900/20"
+                        >
+                          <td className="px-6 py-4 font-bold text-blue-600 dark:text-blue-400">
+                            {stock.symbol}
+                          </td>
+                          <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
+                            {stock.name}
+                          </td>
+                          <td className="px-6 py-4 text-right font-mono font-semibold dark:text-white">
+                            ₹{stock.price}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <button
+                              onClick={() => handleRemoveStock(stock.symbol)}
+                              className="text-gray-400 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                            >
+                              Remove
+                            </button>
+                          </td>
+                        </tr>
+                      ))
                     )}
                   </tbody>
                 </table>

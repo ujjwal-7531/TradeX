@@ -86,34 +86,32 @@ def add_stock_to_watchlist(
 
 @router.delete("/{watchlist_id}/stocks/{symbol}")
 def remove_stock_from_watchlist(
-    watchlist_id: int,
-    symbol: str,
-    user_id: int = Depends(get_current_user_id),
-    db: Session = Depends(get_db)
+    watchlist_id: int, 
+    symbol: str, 
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id)
 ):
-    stock = db.query(Stock).filter(
-        Stock.symbol == symbol.upper()
+    # 1. Verify the watchlist exists and belongs to the user
+    watchlist = db.query(Watchlist).filter(
+        Watchlist.id == watchlist_id, 
+        Watchlist.user_id == user_id
     ).first()
+    
+    if not watchlist:
+        raise HTTPException(status_code=404, detail="Watchlist not found")
 
+    # 2. Find the stock by its symbol
+    stock = db.query(Stock).filter(Stock.symbol == symbol.upper()).first()
     if not stock:
-        raise HTTPException(status_code=404, detail="Stock not found")
+        raise HTTPException(status_code=404, detail="Stock not found in database")
 
-    record = db.query(WatchlistStock).filter(
-        WatchlistStock.watchlist_id == watchlist_id,
-        WatchlistStock.stock_id == stock.id
-    ).first()
-
-    if not record:
-        raise HTTPException(
-            status_code=404,
-            detail="Stock not in watchlist"
-        )
-
-    db.delete(record)
-    db.commit()
-
-    return {"message": "Stock removed from watchlist"}
-
+    # 3. Remove the connection
+    if stock in watchlist.stocks:
+        watchlist.stocks.remove(stock)
+        db.commit()
+        return {"message": f"Successfully removed {symbol} from watchlist"}
+    
+    raise HTTPException(status_code=400, detail="Stock not found in this watchlist")
 
 @router.get("/{watchlist_id}")
 def get_watchlist(

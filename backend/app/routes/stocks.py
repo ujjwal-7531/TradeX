@@ -14,47 +14,25 @@ def get_db():
         yield db
     finally:
         db.close()
-
+        
 @router.get("/search")
-def search_stocks(
-    q: str = Query(..., min_length=1), 
-    db: Session = Depends(get_db),
-    user_id: int = Depends(get_current_user_id) # Optional: Adds a layer of security
-):
-    """
-    Search stocks by symbol (starting with query) or name (containing query).
-    Returns top 10 matches for a fast UI response.
-    """
-    # Alphabetical matching: 
-    # 1. Symbols that start with the query (e.g., 'RE' -> 'RELIANCE')
-    # 2. Names that contain the query anywhere
-    stocks = db.query(Stock).filter(
-        or_(
-            Stock.symbol.ilike(f"{q}%"),
-            Stock.name.ilike(f"%{q}%")
-        )
-    ).order_by(Stock.symbol.asc()).limit(10).all()
-
-    return [
-        {
-            "symbol": s.symbol, 
-            "name": s.name, 
-            "exchange": s.exchange
-        } for s in stocks
-    ]
-    
-@router.get("/search", response_model=List[dict])
 def search_stocks(
     q: str = Query(..., min_length=1),
     db: Session = Depends(get_db),
-    user_id: int = Depends(get_current_user_id)
+    user_id: int = Depends(get_current_user_id) # Keep this for security
 ):
-    # Search by symbol or name (case-insensitive)
     search_query = f"%{q}%"
+    
     results = db.query(Stock).filter(
-        (Stock.symbol.ilike(search_query)) | 
-        (Stock.name.ilike(search_query))
-    ).limit(10).all() # Limit to 10 for performance
+        or_(
+            Stock.symbol.ilike(search_query), 
+            Stock.name.ilike(search_query)
+        )
+    ).order_by(
+        # Prioritize exact symbol matches first
+        Stock.symbol.ilike(f"{q}%").desc(),
+        Stock.symbol.asc()
+    ).limit(10).all() # This is the limit you want
 
     return [
         {

@@ -21,7 +21,7 @@ function StockSearch({ watchlistId, onStockAdded }) {
   // Search Logic (Debounced to prevent server spam)
   useEffect(() => {
     const timer = setTimeout(async () => {
-      if (query.length > 1) {
+      if (query.length > 0) {
         try {
           // Adjust this URL to match your backend search route
           const res = await api.get(`/stocks/search?q=${query}`);
@@ -33,7 +33,7 @@ function StockSearch({ watchlistId, onStockAdded }) {
       } else {
         setResults([]);
       }
-    }, 300);
+    }, 0);
 
     return () => clearTimeout(timer);
   }, [query]);
@@ -60,7 +60,7 @@ function StockSearch({ watchlistId, onStockAdded }) {
       />
 
       {isOpen && results.length > 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border dark:border-gray-600 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border dark:border-gray-600 rounded-lg shadow-xl max-h-80 overflow-y-auto">
           {results.map((stock) => (
             <div
               key={stock.symbol}
