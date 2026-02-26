@@ -10,6 +10,7 @@ from app.schemas.watchlist_stock import WatchlistStockAdd
 from app.schemas.watchlist import WatchlistCreate
 from app.core.dependencies import get_current_user_id
 from app.core.price_service import get_stock_price
+from app.utils.market_data import get_live_prices #
 
 router = APIRouter(prefix="/watchlists", tags=["Watchlists"])
 
@@ -114,38 +115,32 @@ def remove_stock_from_watchlist(
     raise HTTPException(status_code=400, detail="Stock not found in this watchlist")
 
 @router.get("/{watchlist_id}")
-def get_watchlist(
-    watchlist_id: int,
-    user_id: int = Depends(get_current_user_id),
-    db: Session = Depends(get_db)
-):
-    watchlist = db.query(Watchlist).filter(
-        Watchlist.id == watchlist_id,
-        Watchlist.user_id == user_id
-    ).first()
-
+def get_watchlist_details(watchlist_id: int, db: Session = Depends(get_db)):
+    watchlist = db.query(Watchlist).filter(Watchlist.id == watchlist_id).first()
     if not watchlist:
         raise HTTPException(status_code=404, detail="Watchlist not found")
 
-    stocks = (
-        db.query(Stock)
-        .join(WatchlistStock, WatchlistStock.stock_id == Stock.id)
-        .filter(WatchlistStock.watchlist_id == watchlist_id)
-        .all()
-    )
+    # 1. Get symbols from the watchlist
+    symbols = [stock.symbol for stock in watchlist.stocks]
+    
+    # 2. Fetch the actual prices from our new utility
+    live_prices = get_live_prices(symbols)
 
-    result = []
-    for stock in stocks:
-        price = get_stock_price(stock.symbol)
-        result.append({
+    # 3. Build the response list
+    stocks_with_prices = []
+    for stock in watchlist.stocks:
+        stocks_with_prices.append({
+            "id": stock.id,
             "symbol": stock.symbol,
             "name": stock.name,
-            "price": price
+            "exchange": stock.exchange,
+            "price": live_prices.get(stock.symbol, 0.0) # Use the real price here!
         })
 
     return {
-        "watchlist": watchlist.name,
-        "stocks": result
+        "id": watchlist.id,
+        "name": watchlist.name,
+        "stocks": stocks_with_prices
     }
     
 # 3. NEW: Delete Entire Watchlist
