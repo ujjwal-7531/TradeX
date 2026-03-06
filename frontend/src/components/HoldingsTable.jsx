@@ -15,41 +15,63 @@ function HoldingsTable({ holdings, onAction }) {
     <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow mt-6 overflow-visible w-full min-h-[300px] mb-32">
       <h3 className="text-lg font-semibold mb-4">Your Holdings</h3>
 
-      <table className="w-full text-sm border-collapse text-black dark:text-gray-200">
-        <thead>
-          <tr className="text-left border-b">
-            <th className="pb-2">Symbol</th>
-            <th className="pb-2">Qty</th>
-            <th className="pb-2">Avg Price</th>
-            <th className="pb-2">Current Price</th>
-            <th className="pb-2">Invested</th>
-            <th className="pb-2">Current Value</th>
-            <th className="pb-2">P&L</th>
-            <th className="pb-2"></th>
-          </tr>
-        </thead>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm border-collapse text-left whitespace-nowrap">
+          <thead>
+            <tr className="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider font-semibold border-b border-gray-200 dark:border-gray-700">
+              <th className="px-6 py-4 rounded-tl-lg">Symbol</th>
+              <th className="px-6 py-4">Qty</th>
+              <th className="px-6 py-4 text-right">Avg Price</th>
+              <th className="px-6 py-4 text-right">Current Price</th>
+              <th className="px-6 py-4 text-right">Invested</th>
+              <th className="px-6 py-4 text-right">Current Value</th>
+              <th className="px-6 py-4 text-right">P&L</th>
+              <th className="px-6 py-4 rounded-tr-lg"></th>
+            </tr>
+          </thead>
         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
           {holdings.map((h) => {
-            const pnlColor =
-              h.unrealized_pnl >= 0 ? "text-green-600" : "text-red-600";
+            const isPositive = h.unrealized_pnl >= 0;
+            const pnlColor = isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400";
+            const pnlBg = isPositive ? "bg-emerald-50 dark:bg-emerald-500/10" : "bg-rose-50 dark:bg-rose-500/10";
+            const pnlChevron = isPositive ? "▲" : "▼";
 
             return (
-              <tr key={h.symbol} className="border-b last:border-b-0">
-                <td className="py-2 font-medium">{h.symbol}</td>
-                <td>{h.quantity}</td>
-                <td>₹ {h.avg_price.toFixed(2)}</td>
-                <td>₹ {h.current_price.toFixed(2)}</td>
-                <td>₹ {h.invested_value.toFixed(2)}</td>
-                <td>₹ {h.current_value.toFixed(2)}</td>
-                <td className={pnlColor}>₹ {h.unrealized_pnl.toFixed(2)}</td>
-                <td className="relative">
+              <tr key={h.symbol} className="border-b dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
+                <td className="px-6 py-4 font-bold text-blue-600 dark:text-blue-400">
+                  {h.symbol}
+                </td>
+                <td className="px-6 py-4 text-gray-700 dark:text-gray-300 font-medium">
+                  {h.quantity}
+                </td>
+                <td className="px-6 py-4 text-right text-gray-600 dark:text-gray-400 font-mono">
+                  ₹{h.avg_price.toFixed(2)}
+                </td>
+                <td className="px-6 py-4 text-right text-gray-900 dark:text-gray-100 font-mono font-medium">
+                  ₹{h.current_price.toFixed(2)}
+                </td>
+                <td className="px-6 py-4 text-right text-gray-600 dark:text-gray-400 font-mono">
+                  ₹{h.invested_value.toFixed(2)}
+                </td>
+                <td className="px-6 py-4 text-right text-gray-900 dark:text-gray-100 font-mono font-semibold">
+                  ₹{h.current_value.toFixed(2)}
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex justify-end">
+                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md font-mono font-medium text-sm ${pnlColor} ${pnlBg}`}>
+                      <span className="text-[10px]">{pnlChevron}</span>
+                      <span>₹{Math.abs(h.unrealized_pnl).toFixed(2)}</span>
+                      <span className="opacity-75 relative -top-[1px]">({h.pnl_percent}%)</span>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4 text-right relative">
                   <button
-                    onClick={() =>
-                      setOpenMenu(openMenu === h.symbol ? null : h.symbol)
-                    }
-                    className="px-2 py-1 hover:bg-gray-200 rounded"
+                    onClick={() => setOpenMenu(openMenu === h.symbol ? null : h.symbol)}
+                    className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                    aria-label="Actions"
                   >
-                    ⋮
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
                   </button>
 
                   {openMenu === h.symbol && (
@@ -103,6 +125,7 @@ function HoldingsTable({ holdings, onAction }) {
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

@@ -1,54 +1,79 @@
 function TransactionsTable({ transactions }) {
   if (!transactions || transactions.length === 0) {
     return (
-      <div className="bg-white p-6 rounded shadow mt-6">
-        <p className="text-gray-500 text-sm">
+      <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow mt-6 text-center border border-gray-100 dark:border-gray-700">
+        <div className="text-4xl mb-3">📭</div>
+        <p className="text-gray-500 dark:text-gray-400 font-medium">
           No transactions yet.
         </p>
+        <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">When you buy or sell stocks, they will appear here.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded shadow mt-6 overflow-x-auto">
-      <h3 className="text-lg font-semibold mb-4">
-        Recent Transactions
-      </h3>
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden w-full border border-gray-100 dark:border-gray-700">
+      {/* Hide the inner header if rendered inside the Transactions page, as the page already has a header */}
+      {/* <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Recent Transactions</h3>
+      </div> */}
 
-      <table className="w-full text-sm border-collapse text-black dark:text-gray-200">
-        <thead>
-          <tr className="text-left border-b border-gray-200 dark:border-gray-700">
-            <th className="pb-2">Type</th>
-            <th className="pb-2">Symbol</th>
-            <th className="pb-2">Qty</th>
-            <th className="pb-2">Price</th>
-            <th className="pb-2">Time</th>
-          </tr>
-        </thead>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm border-collapse text-left whitespace-nowrap">
+          <thead>
+            <tr className="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider font-semibold border-b border-gray-200 dark:border-gray-700">
+              <th className="px-6 py-4">Action</th>
+              <th className="px-6 py-4">Stock</th>
+              <th className="px-6 py-4 text-right">Quantity</th>
+              <th className="px-6 py-4 text-right">Execution Price</th>
+              <th className="px-6 py-4 text-right">Total Value</th>
+              <th className="px-6 py-4 text-right">Date & Time</th>
+            </tr>
+          </thead>
 
-        <tbody>
-          {transactions.map((tx) => {
-            const typeColor =
-              tx.trade_type === "BUY"
-                ? "text-green-600"
-                : "text-red-600";
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+            {transactions.map((tx) => {
+              const isBuy = tx.trade_type === "BUY";
+              const typeColor = isBuy ? "text-emerald-700 dark:text-emerald-400" : "text-rose-700 dark:text-rose-400";
+              const typeBg = isBuy ? "bg-emerald-100 dark:bg-emerald-500/20" : "bg-rose-100 dark:bg-rose-500/20";
+              const typeIcon = isBuy ? "↙" : "↗";
+              const totalValue = tx.quantity * tx.price;
 
-            return (
-              <tr key={tx.id} className="border-b last:border-b-0">
-                <td className={`py-2 font-medium ${typeColor}`}>
-                  {tx.trade_type}
-                </td>
-                <td>{tx.symbol}</td>
-                <td>{tx.quantity}</td>
-                <td>₹ {tx.price.toFixed(2)}</td>
-                <td className="text-gray-500">
-                  {new Date(tx.created_at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+              return (
+                <tr key={tx.id} className="group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide ${typeColor} ${typeBg}`}>
+                      {typeIcon} {tx.trade_type}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 font-bold text-blue-600 dark:text-blue-400">
+                    {tx.symbol}
+                  </td>
+                  <td className="px-6 py-4 text-right text-gray-700 dark:text-gray-300 font-medium">
+                    {tx.quantity} <span className="text-gray-400 dark:text-gray-500 font-normal text-xs ml-1">shares</span>
+                  </td>
+                  <td className="px-6 py-4 text-right text-gray-900 dark:text-gray-100 font-mono font-medium">
+                    ₹{tx.price.toFixed(2)}
+                  </td>
+                  <td className="px-6 py-4 text-right text-gray-900 dark:text-gray-100 font-mono font-bold">
+                    ₹{totalValue.toFixed(2)}
+                  </td>
+                  <td className="px-6 py-4 text-right text-gray-500 dark:text-gray-400 font-mono text-xs">
+                    {new Date(tx.created_at).toLocaleString("en-IN", { 
+                      timeZone: "Asia/Kolkata",
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit"
+                    })}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

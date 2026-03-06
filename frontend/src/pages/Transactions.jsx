@@ -49,33 +49,30 @@ function Transactions() {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Transaction History</h2>
 
-          <div className="flex items-center space-x-3">
-            <label className="text-sm text-gray-500 dark:text-gray-400">
-              Show:
+          <div className="flex items-center gap-2 bg-white dark:bg-gray-800 p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+            <label className="text-sm font-medium text-gray-500 dark:text-gray-400 pl-2">
+              View
             </label>
-            <div className="flex items-center space-x-3">
-              <label className="text-sm text-gray-500 dark:text-gray-400">
-                Limit:
-              </label>
-              <input
-                type="number"
-                min="1"
-                max="500" // Safety cap
-                value={limit}
-                onChange={(e) => setLimit(Number(e.target.value))}
-                className="w-16 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded px-2 py-1 text-sm outline-none focus:ring-2 focus:ring-blue-500 text-center"
-              />
-            </div>
+            <select
+              value={limit}
+              onChange={(e) => setLimit(Number(e.target.value))}
+              className="bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm font-semibold rounded-md outline-none cursor-pointer py-1.5 px-3 border border-transparent focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={500}>All (500)</option>
+            </select>
+            <span className="text-sm text-gray-500 dark:text-gray-400 pr-2">transactions</span>
           </div>
         </div>
 
         {loading ? (
           <p className="text-gray-500">Loading history...</p>
         ) : (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-            <div className="max-h-[600px] overflow-y-auto custom-scrollbar">
-              <TransactionsTable transactions={transactions} />
-            </div>
+          <div className="w-full">
+            <TransactionsTable transactions={transactions} />
           </div>
         )}
       </div>

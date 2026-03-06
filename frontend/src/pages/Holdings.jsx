@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchPortfolioSummary } from "../api/portfolio";
+import PortfolioSummary from "../components/PortfolioSummary";
 import HoldingsTable from "../components/HoldingsTable";
 import TopBar from "../components/TopBar";
 import BuySellCard from "../components/BuySellCard";
@@ -46,9 +47,8 @@ function Holdings() {
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       <TopBar email="user@example.com" onLogout={() => { removeToken(); navigate("/login"); }} onToggleTheme={toggleTheme} isDark={isDark} />
       
-      <div className="p-6 text-black dark:text-white">
-        <h2 className="text-2xl font-bold mb-4">My Portfolio Holdings</h2>
-        
+      <div className="p-6 text-black dark:text-white flex flex-col gap-6">
+        <PortfolioSummary data={data} />
         {chartSymbol && <TradingViewChart symbol={chartSymbol} onClose={() => setChartSymbol(null)} />}
         
         {tradeOpen && (
