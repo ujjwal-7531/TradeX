@@ -12,7 +12,7 @@ function HoldingsTable({ holdings, onAction }) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded shadow mt-6 overflow-x-auto">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow mt-6 overflow-visible w-full min-h-[300px] mb-32">
       <h3 className="text-lg font-semibold mb-4">Your Holdings</h3>
 
       <table className="w-full text-sm border-collapse text-black dark:text-gray-200">
@@ -28,8 +28,7 @@ function HoldingsTable({ holdings, onAction }) {
             <th className="pb-2"></th>
           </tr>
         </thead>
-
-        <tbody>
+        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
           {holdings.map((h) => {
             const pnlColor =
               h.unrealized_pnl >= 0 ? "text-green-600" : "text-red-600";

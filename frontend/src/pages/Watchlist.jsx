@@ -212,7 +212,7 @@ function WatchlistPage() {
         </div>
 
         {/* RIGHT CONTENT: Stock List */}
-        <div className="flex-1 p-8 overflow-y-auto">
+        <div className="flex-1 p-8 pb-32 overflow-y-auto">
           {chartSymbol && <TradingViewChart symbol={chartSymbol} onClose={() => setChartSymbol(null)} />}
           {tradeOpen && (
             <BuySellCard 
@@ -240,11 +240,11 @@ function WatchlistPage() {
               </div>
 
               {/* Stocks Table */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow overflow-visible">
                 <table className="w-full">
                   <thead className="bg-gray-50 dark:bg-gray-700 text-left">
                     <tr>
-                      <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase rounded-tl-xl">
                         Symbol
                       </th>
                       <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">
@@ -253,7 +253,7 @@ function WatchlistPage() {
                       <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase text-right">
                         Price
                       </th>
-                      <th className="px-6 py-3"></th>
+                      <th className="px-6 py-3 rounded-tr-xl"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y dark:divide-gray-700">
