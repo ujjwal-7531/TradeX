@@ -10,7 +10,6 @@ function Transactions() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. Add state for the limit (default to 10 or 20)
   const [limit, setLimit] = useState(20);
 
   const [isDark, setIsDark] = useState(
@@ -22,7 +21,6 @@ function Transactions() {
     setIsDark(!isDark);
   };
 
-  // 2. Add limit to the dependency array so it refetches when changed
   useEffect(() => {
     setLoading(true);
     fetchTransactions(limit, 0)
@@ -51,12 +49,10 @@ function Transactions() {
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Transaction History</h2>
 
-          {/* 3. Add the Dropdown UI */}
           <div className="flex items-center space-x-3">
             <label className="text-sm text-gray-500 dark:text-gray-400">
               Show:
             </label>
-            {/* Replace the select div with this */}
             <div className="flex items-center space-x-3">
               <label className="text-sm text-gray-500 dark:text-gray-400">
                 Limit:
@@ -77,7 +73,6 @@ function Transactions() {
           <p className="text-gray-500">Loading history...</p>
         ) : (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-            {/* This wrapper enables internal scrolling */}
             <div className="max-h-[600px] overflow-y-auto custom-scrollbar">
               <TransactionsTable transactions={transactions} />
             </div>

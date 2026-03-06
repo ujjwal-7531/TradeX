@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { removeToken } from "../utils/auth";
 import TopBar from "../components/TopBar";
+import BuySellCard from "../components/BuySellCard";
+import TradingViewChart from "../components/TradingViewChart";
 import { fetchPortfolioSummary } from "../api/portfolio";
 import { fetchTransactions} from "../api/transactions";
 import {
@@ -16,13 +18,26 @@ import { useNavigate } from "react-router-dom";
 import api from '../api/axios'; // Adjust the path if your axios file is elsewhere
 
 function WatchlistPage() {
-  const [transactions, setTransactions] = useState([]);
-  const [data, setData] = useState(null);
   const navigate = useNavigate();
   const [watchlists, setWatchlists] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [currentWatchlist, setCurrentWatchlist] = useState(null);
   const [newListName, setNewListName] = useState("");
+  const [openMenu, setOpenMenu] = useState(null);
+  const [tradeOpen, setTradeOpen] = useState(false);
+  const [tradeType, setTradeType] = useState(null);
+  const [tradeSymbol, setTradeSymbol] = useState("");
+  const [chartSymbol, setChartSymbol] = useState(null);
+
+  const handleAction = (symbol, type) => {
+    if (type === "BUY" || type === "SELL") {
+      setTradeSymbol(symbol);
+      setTradeType(type);
+      setTradeOpen(true);
+    } else if (type === "CHART") {
+      setChartSymbol(symbol);
+    }
+  };
 
   // Load sidebar data
   const loadSidebar = async () => {
@@ -41,17 +56,27 @@ function WatchlistPage() {
   };
 
   // Load specific stocks when selection changes
-  const loadDetail = async () => {
+  const loadWatchlistDetails = async () => {
     if (!selectedId) return;
-    const data = await fetchWatchlistDetail(selectedId);
-    setCurrentWatchlist(data);
+    try {
+      const data = await fetchWatchlistById(selectedId);
+      setCurrentWatchlist(data);
+    } catch (err) {
+      console.error("Error loading stocks:", err);
+    }
   };
 
   useEffect(() => {
     loadSidebar();
   }, []);
+
+  // 1. Automatically load details when selectedId changes
   useEffect(() => {
-    loadDetail();
+    if (selectedId) {
+      loadWatchlistDetails();
+    } else {
+      setCurrentWatchlist(null);
+    }
   }, [selectedId]);
 
   const handleCreate = async (e) => {
@@ -78,27 +103,6 @@ function WatchlistPage() {
     }
   };
 
-  // 1. Define the missing function
-  const loadWatchlistDetails = async () => {
-    if (!selectedId) return;
-    try {
-      const data = await fetchWatchlistById(selectedId);
-      setCurrentWatchlist(data);
-    } catch (err) {
-      console.error("Error loading stocks:", err);
-    }
-  };
-
-  // 2. Automatically trigger the load when a user clicks a list in the sidebar
-  useEffect(() => {
-    if (selectedId) {
-      loadWatchlistDetails();
-    } else {
-      setCurrentWatchlist(null);
-    }
-  }, [selectedId]);
-
-  // 3. Define the handleRemoveStock function (since it's used in your table)
   const handleRemoveStock = async (symbol) => {
     try {
       await api.delete(`/watchlists/${selectedId}/stocks/${symbol}`);
@@ -121,9 +125,11 @@ function WatchlistPage() {
     document.documentElement.classList.toggle("dark");
     setIsDark(!isDark);
   };
+
   const refreshData = () => {
-    fetchPortfolioSummary().then(setData);
-    fetchTransactions(10, 0).then(setTransactions);
+    // Only used to pass to TopBar, though fetchPortfolioSummary is unused in this UI
+    fetchPortfolioSummary();
+    fetchTransactions(10, 0);
   };
 
   return (
@@ -207,6 +213,16 @@ function WatchlistPage() {
 
         {/* RIGHT CONTENT: Stock List */}
         <div className="flex-1 p-8 overflow-y-auto">
+          {chartSymbol && <TradingViewChart symbol={chartSymbol} onClose={() => setChartSymbol(null)} />}
+          {tradeOpen && (
+            <BuySellCard 
+              type={tradeType} 
+              symbol={tradeSymbol} 
+              onClose={() => setTradeOpen(false)} 
+              onSuccess={() => { setTradeOpen(false); refreshData(); }} 
+            />
+          )}
+
           {selectedId ? (
             <div>
               {/* Header Area */}
@@ -268,13 +284,55 @@ function WatchlistPage() {
                           <td className="px-6 py-4 text-right font-mono font-semibold dark:text-white">
                             ₹{stock.price}
                           </td>
-                          <td className="px-6 py-4 text-right">
+                          <td className="px-6 py-4 text-right relative">
                             <button
-                              onClick={() => handleRemoveStock(stock.symbol)}
-                              className="text-gray-400 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                              onClick={() => setOpenMenu(openMenu === stock.symbol ? null : stock.symbol)}
+                              className="px-2 py-1 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
                             >
-                              Remove
+                              ⋮
                             </button>
+
+                            {openMenu === stock.symbol && (
+                              <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow z-10 text-left">
+                                <button
+                                  className="block w-full text-left px-3 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                  onClick={() => {
+                                    handleAction(stock.symbol, "BUY");
+                                    setOpenMenu(null);
+                                  }}
+                                >
+                                  Buy
+                                </button>
+                                <button
+                                  className="block w-full text-left px-3 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                  onClick={() => {
+                                    handleAction(stock.symbol, "SELL");
+                                    setOpenMenu(null);
+                                  }}
+                                >
+                                  Sell
+                                </button>
+                                <button
+                                  className="block w-full text-left px-3 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                  onClick={() => {
+                                    handleAction(stock.symbol, "CHART");
+                                    setOpenMenu(null);
+                                  }}
+                                >
+                                  View Chart
+                                </button>
+                                <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                                <button
+                                  className="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                  onClick={() => {
+                                    handleRemoveStock(stock.symbol);
+                                    setOpenMenu(null);
+                                  }}
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            )}
                           </td>
                         </tr>
                       ))

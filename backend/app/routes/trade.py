@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from decimal import Decimal
 
 from app.database import SessionLocal
 from app.core.dependencies import get_current_user_id
@@ -8,15 +9,10 @@ from app.core.price_service import get_stock_price
 from app.models.stock import Stock
 from app.models.portfolio import Portfolio
 from app.models.holding import Holding
-from app.schemas.trade import BuyStockRequest
-from app.schemas.trade import SellStockRequest
 from app.models.transaction import Transaction
-
-from decimal import Decimal
-
+from app.schemas.trade import BuyStockRequest, SellStockRequest
 
 router = APIRouter(prefix="/trade", tags=["Trading"])
-
 
 def get_db():
     db = SessionLocal()
@@ -30,12 +26,9 @@ def buy_stock(
     data: BuyStockRequest,
     user_id: int = Depends(get_current_user_id),
     db: Session = Depends(get_db)
-    
 ):
     symbol = data.symbol.upper()
-    stock = db.query(Stock).filter(
-        Stock.symbol == symbol
-    ).first()
+    stock = db.query(Stock).filter(Stock.symbol == symbol).first()
 
     if not stock:
         raise HTTPException(
@@ -45,7 +38,6 @@ def buy_stock(
         
     price = Decimal(str(get_stock_price(symbol)))
 
-
     if price <= 0:
         raise HTTPException(
             status_code=400,
@@ -53,7 +45,7 @@ def buy_stock(
         )
 
     portfolio = db.query(Portfolio).filter(
-    Portfolio.user_id == user_id
+        Portfolio.user_id == user_id
     ).first()
 
     if not portfolio:
@@ -82,23 +74,19 @@ def buy_stock(
             quantity=data.quantity,
             avg_price=price
         )
-
         db.add(holding)
-        
     else:
         old_qty = holding.quantity
         old_avg = holding.avg_price
 
         new_qty = old_qty + data.quantity
-
-        new_avg = (
-            (old_qty * old_avg) + (data.quantity * price)
-        ) / new_qty
+        new_avg = ((old_qty * old_avg) + (data.quantity * price)) / new_qty
 
         holding.quantity = new_qty
         holding.avg_price = new_avg
 
     portfolio.cash_balance -= total_cost
+    
     transaction = Transaction(
         user_id=user_id,
         stock_id=stock.id,
@@ -108,7 +96,6 @@ def buy_stock(
     )
 
     db.add(transaction)
-
     db.commit()
 
     return {
@@ -120,6 +107,7 @@ def buy_stock(
         "remaining_balance": portfolio.cash_balance
     }
 
+
 @router.post("/sell")
 def sell_stock(
     data: SellStockRequest,
@@ -127,10 +115,7 @@ def sell_stock(
     db: Session = Depends(get_db)
 ):
     symbol = data.symbol.upper()
-
-    stock = db.query(Stock).filter(
-        Stock.symbol == symbol
-    ).first()
+    stock = db.query(Stock).filter(Stock.symbol == symbol).first()
 
     if not stock:
         raise HTTPException(
@@ -174,10 +159,7 @@ def sell_stock(
         )
         
     sell_value = sell_price * data.quantity
-
-    realized_pnl = (
-        sell_price - holding.avg_price
-    ) * data.quantity
+    realized_pnl = (sell_price - holding.avg_price) * data.quantity
     
     portfolio.cash_balance += sell_value
 
@@ -185,7 +167,6 @@ def sell_stock(
         holding.quantity -= data.quantity
     else:
         db.delete(holding)
-        
         
     transaction = Transaction(
         user_id=user_id,
@@ -195,10 +176,7 @@ def sell_stock(
         price=sell_price
     )
 
-
     db.add(transaction)
-
-    
     db.commit()
 
     return {
@@ -210,4 +188,3 @@ def sell_stock(
         "realized_pnl": realized_pnl,
         "remaining_balance": portfolio.cash_balance
     }
-

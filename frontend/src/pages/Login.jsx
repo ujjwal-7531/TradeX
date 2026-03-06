@@ -25,14 +25,14 @@ function Login() {
 
       setToken(res.data.access_token);
       navigate("/dashboard"); // 👈 THIS WAS MISSING
-      alert("Login successful");
     } catch (err) {
       setError("Invalid email or password");
     } finally {
       setLoading(false);
     }
   };
-  const isLogin = true
+  const isLogin = true;
+
   return (
   <div 
     className="min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat"

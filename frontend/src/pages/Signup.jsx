@@ -22,7 +22,6 @@ function Signup() {
         password,
       });
 
-      alert("Signup successful. Please login.");
       navigate("/login");
     } catch (err) {
       if (err.response?.data?.detail) {

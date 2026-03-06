@@ -21,7 +21,6 @@ def get_db():
     finally:
         db.close()
 
-# @router.get("")
 @router.get("")
 def get_transactions(
     limit: int = 20,
@@ -59,7 +58,6 @@ def get_transactions(
             "trade_type": txn.trade_type,
             "quantity": txn.quantity,
             "price": txn.price,
-            # "total_value": txn.total_value,
             "created_at": txn.created_at.replace(tzinfo=timezone.utc).isoformat()
 
         })

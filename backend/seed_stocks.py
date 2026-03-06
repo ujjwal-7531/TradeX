@@ -20,7 +20,7 @@ def seed():
                 new_entries.append(Stock(
                     symbol=sym,
                     name=str(row['name']).strip(),
-                    exchange="NSE/BSE" # Default value
+                    exchange="NSE" # Default value
                 ))
                 existing.add(sym)
 

@@ -42,22 +42,36 @@ def portfolio_summary(
     total_invested = Decimal("0.00")
     total_current_value = Decimal("0.00")
 
+    if not holdings:
+        return {
+            "cash_balance": portfolio.cash_balance,
+            "total_invested": total_invested,
+            "current_value": total_current_value,
+            "total_unrealized_pnl": total_invested,
+            "net_worth": portfolio.cash_balance,
+            "holdings": []
+        }
+
+    # 1. Fetch all stock details in ONE query
+    stock_ids = [h.stock_id for h in holdings]
+    stocks = db.query(Stock).filter(Stock.id.in_(stock_ids)).all()
+    stock_map = {s.id: s for s in stocks}
+
+    # 2. Fetch all live prices in ONE API call (bulk)
+    symbols = [s.symbol for s in stocks]
+    from app.utils.market_data import get_live_prices
+    live_prices = get_live_prices(symbols)
+
     holdings_data = []
     
     for holding in holdings:
-        stock = db.query(Stock).filter(
-            Stock.id == holding.stock_id
-        ).first()
+        stock = stock_map.get(holding.stock_id)
 
         if not stock:
             continue  # safety guard
         
-        current_price = Decimal(
-            str(get_stock_price(stock.symbol))
-        )
-
-        if current_price <= 0:
-            continue
+        # Use bulk fetched price, fallback to 0
+        current_price = Decimal(str(live_prices.get(stock.symbol, 0.0)))
         
         quantity = holding.quantity
         avg_price = holding.avg_price
@@ -111,14 +125,3 @@ def portfolio_summary(
         "net_worth": net_worth,
         "holdings": holdings_data
     }
-
-
-
-
-
-
-
-
-
-
-

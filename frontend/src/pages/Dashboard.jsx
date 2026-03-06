@@ -7,8 +7,6 @@ import { removeToken } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 import { fetchTransactions } from "../api/transactions";
 import TransactionsTable from "../components/TransactionsTable";
-import BuySellCard from "../components/BuySellCard";
-import TradingViewChart from "../components/TradingViewChart";
 import TopBar from "../components/TopBar";
 import MarketOverviewWidget from "../components/MarketOverviewWidget"; //for market overview widget
 
@@ -16,55 +14,27 @@ import MarketOverviewWidget from "../components/MarketOverviewWidget"; //for mar
 
 function Dashboard() {
   const navigate = useNavigate();
-  const [tradeOpen, setTradeOpen] = useState(false);
-  const [tradeType, setTradeType] = useState(null); // "BUY" | "SELL"
-  const [tradeSymbol, setTradeSymbol] = useState("");
 
   const [isDark, setIsDark] = useState(
     document.documentElement.classList.contains("dark")
   );
-  useEffect(() => {
-    fetchPortfolioSummary().then(setData);
-    // Only fetch a small preview (last 5) for the dashboard
-    fetchTransactions(5, 0).then(setTransactions);
-  }, []);
 
   const toggleTheme = () => {
     document.documentElement.classList.toggle("dark");
     setIsDark(!isDark);
   };
 
-
   const [data, setData] = useState(null);
   const [transactions, setTransactions] = useState([]);
+
   const refreshData = () => {
     fetchPortfolioSummary().then(setData);
-    fetchTransactions(10, 0).then(setTransactions);
+    fetchTransactions(5, 0).then(setTransactions);
   };
-
-  // 2. SINGLE EFFECT ON MOUNT
+  // Fetch data on mount
   useEffect(() => {
     refreshData();
   }, []);
-
-  // buy sell wiring
-  const [selectedSymbol, setSelectedSymbol] = useState("");
-  const [selectedTradeType, setSelectedTradeType] = useState(null);
-
-  const handleHoldingAction = (symbol, type) => {
-    if (type === "BUY" || type === "SELL") {
-      setTradeSymbol(symbol);
-      setTradeType(type);
-      setTradeOpen(true);
-    }
-
-    if (type === "CHART") {
-      setChartSymbol(symbol);
-    }
-  };
-
-  // chart 
-  const [chartSymbol, setChartSymbol] = useState(null);
 
 
   const handleLogout = () => {
@@ -93,25 +63,6 @@ function Dashboard() {
 
         {/* market overview widget*/}
         <MarketOverviewWidget isDark={isDark} />
-
-
-        {chartSymbol && (
-          <TradingViewChart
-            symbol={chartSymbol}
-            onClose={() => setChartSymbol(null)}
-          />
-        )}
-        {tradeOpen && (
-          <BuySellCard
-            type={tradeType}
-            symbol={tradeSymbol}
-            onClose={() => setTradeOpen(false)}
-            onSuccess={() => {
-              setTradeOpen(false);
-              refreshData();
-            }}
-          />
-        )}
       </div>
     </div>
   );

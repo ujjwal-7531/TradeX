@@ -47,6 +47,7 @@
 
 import time
 from decimal import Decimal
+from app.utils.market_data import get_live_prices
 
 # Cache expiry time in seconds (change anytime)
 CACHE_TTL = 30
@@ -63,13 +64,15 @@ _price_cache = {}
 
 def _fetch_price_from_api(symbol: str) -> Decimal:
     """
-    Fetch stock price from external API.
-    Replace the placeholder logic with Finnhub / Yahoo later.
+    Fetch stock price from external API via our yfinance utility.
     """
-    print(f"[PRICE API CALL] Fetching price for {symbol}")
+    print(f"[PRICE API CALL] Fetching live price for {symbol}")
 
-    # TODO: Replace this with real API call
-    price = 3500.00  
+    prices = get_live_prices([symbol])
+    price = prices.get(symbol, 0.0)
+
+    if price <= 0.0:
+        raise ValueError(f"Failed to fetch a valid price for {symbol}. Market might be inaccessible.")
 
     return Decimal(str(price))
 
