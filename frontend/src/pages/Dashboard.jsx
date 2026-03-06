@@ -10,6 +10,7 @@ import TransactionsTable from "../components/TransactionsTable";
 import TopBar from "../components/TopBar";
 import MarketOverviewWidget from "../components/MarketOverviewWidget";
 import StockHeatmap from "../components/StockHeatmap";
+import PortfolioAnalytics from "../components/PortfolioAnalytics";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -57,6 +58,9 @@ function Dashboard() {
       <div className="p-6 text-black dark:text-white">
         {/*portfolio summary*/}
         <PortfolioSummary data={data} />
+
+        {/* portfolio analytics donut chart */}
+        <PortfolioAnalytics holdings={data.holdings} />
 
         {/* indian stock heatmap */}
         <StockHeatmap isDark={isDark} />
