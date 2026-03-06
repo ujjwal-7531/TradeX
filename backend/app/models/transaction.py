@@ -9,14 +9,14 @@ class Transaction(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     stock_id = Column(Integer, ForeignKey("stocks.id"), nullable=False)
-
     trade_type = Column(String(10), nullable=False)  # BUY / SELL
     quantity = Column(Integer, nullable=False)
     price = Column(DECIMAL(15, 2), nullable=False)
-    # created_at = Column(TIMESTAMP, nullable=False, default=datetime.now(timezone.utc))
     created_at = Column(
         DateTime(timezone=True),
         nullable=False,
         default=lambda: datetime.now(timezone.utc)
     )
-    stock = relationship("Stock")
+
+    stock = relationship("Stock", back_populates="transactions")
+    user = relationship("User", back_populates="transactions")

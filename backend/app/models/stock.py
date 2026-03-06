@@ -1,7 +1,7 @@
-from sqlalchemy import Column, Integer, String, TIMESTAMP, text,ForeignKey, Table
-from app.database import Base
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
-
+from app.database import Base
+from datetime import datetime, timezone
 
 class Stock(Base):
     __tablename__ = "stocks"
@@ -10,12 +10,12 @@ class Stock(Base):
     symbol = Column(String(20), unique=True, nullable=False)
     name = Column(String(255), nullable=False)
     exchange = Column(String(20), default='NSE', nullable=False)
-
     created_at = Column(
-        TIMESTAMP,
+        DateTime(timezone=True),
         nullable=False,
-        server_default=text("CURRENT_TIMESTAMP")
+        default=lambda: datetime.now(timezone.utc)
     )
 
     watchlists = relationship("Watchlist", secondary="watchlist_stocks", back_populates="stocks") 
-    
+    transactions = relationship("Transaction", back_populates="stock")
+    holdings = relationship("Holding", back_populates="stock")
