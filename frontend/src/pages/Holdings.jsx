@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchPortfolioSummary } from "../api/portfolio";
+import { fetchPortfolioSummary, fetchStockTrends } from "../api/portfolio";
 import PortfolioSummary from "../components/PortfolioSummary";
 import HoldingsTable from "../components/HoldingsTable";
 import TopBar from "../components/TopBar";
@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 function Holdings() {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
+  const [trends, setTrends] = useState({});
   const [tradeOpen, setTradeOpen] = useState(false);
   const [tradeType, setTradeType] = useState(null);
   const [tradeSymbol, setTradeSymbol] = useState("");
@@ -24,7 +25,13 @@ function Holdings() {
   };
 
   const loadData = () => {
-    fetchPortfolioSummary().then(setData);
+    fetchPortfolioSummary().then(res => {
+      setData(res);
+      if (res && res.holdings && res.holdings.length > 0) {
+        const symbols = res.holdings.map(h => h.symbol);
+        fetchStockTrends(symbols).then(setTrends).catch(console.error);
+      }
+    });
   };
 
   useEffect(() => {
@@ -60,7 +67,7 @@ function Holdings() {
           />
         )}
 
-        <HoldingsTable holdings={data.holdings} onAction={handleAction} />
+        <HoldingsTable holdings={data.holdings} trends={trends} onAction={handleAction} />
       </div>
     </div>
   );

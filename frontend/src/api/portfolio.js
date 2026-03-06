@@ -17,3 +17,14 @@ export async function fetchPortfolioSummary() {
   const res = await api.get("/portfolio/summary");
   return res.data;
 }
+
+export async function fetchStockTrends(symbols) {
+  if (!symbols || symbols.length === 0) return {};
+  
+  // Axios formatting for list query params
+  const params = new URLSearchParams();
+  symbols.forEach(s => params.append("symbols", s));
+  
+  const res = await api.get(`/portfolio/trends?${params.toString()}`);
+  return res.data;
+}

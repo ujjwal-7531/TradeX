@@ -1,6 +1,7 @@
 import { useState } from "react";
+import Sparkline from "./Sparkline";
 
-function HoldingsTable({ holdings, onAction }) {
+function HoldingsTable({ holdings, trends, onAction }) {
   const [openMenu, setOpenMenu] = useState(null);
 
   if (!holdings || holdings.length === 0) {
@@ -26,6 +27,7 @@ function HoldingsTable({ holdings, onAction }) {
               <th className="px-6 py-4 text-right">Invested</th>
               <th className="px-6 py-4 text-right">Current Value</th>
               <th className="px-6 py-4 text-right">P&L</th>
+              <th className="px-6 py-4 text-center">7D Trend</th>
               <th className="px-6 py-4 rounded-tr-lg"></th>
             </tr>
           </thead>
@@ -64,6 +66,9 @@ function HoldingsTable({ holdings, onAction }) {
                       <span className="opacity-75 relative -top-[1px]">({h.pnl_percent}%)</span>
                     </div>
                   </div>
+                </td>
+                <td className="px-6 py-4 flex justify-center">
+                  <Sparkline data={trends?.[h.symbol] || []} />
                 </td>
                 <td className="px-6 py-4 text-right relative">
                   <button

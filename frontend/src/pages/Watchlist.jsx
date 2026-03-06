@@ -15,7 +15,9 @@ import {
 } from "../api/watchlists";
 import StockSearch from "../components/SearchStock";
 import { useNavigate } from "react-router-dom";
-import api from '../api/axios'; // Adjust the path if your axios file is elsewhere
+import api from '../api/axios';
+import { fetchStockTrends } from "../api/portfolio";
+import Sparkline from "../components/Sparkline";
 
 function WatchlistPage() {
   const navigate = useNavigate();
@@ -28,6 +30,7 @@ function WatchlistPage() {
   const [tradeType, setTradeType] = useState(null);
   const [tradeSymbol, setTradeSymbol] = useState("");
   const [chartSymbol, setChartSymbol] = useState(null);
+  const [trends, setTrends] = useState({});
 
   const handleAction = (symbol, type) => {
     if (type === "BUY" || type === "SELL") {
@@ -55,12 +58,16 @@ function WatchlistPage() {
     }
   };
 
-  // Load specific stocks when selection changes
   const loadWatchlistDetails = async () => {
     if (!selectedId) return;
     try {
       const data = await fetchWatchlistById(selectedId);
       setCurrentWatchlist(data);
+
+      if (data && data.stocks && data.stocks.length > 0) {
+        const symbols = data.stocks.map(s => s.symbol);
+        fetchStockTrends(symbols).then(setTrends).catch(console.error);
+      }
     } catch (err) {
       console.error("Error loading stocks:", err);
     }
@@ -253,6 +260,9 @@ function WatchlistPage() {
                       <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase text-right">
                         Price
                       </th>
+                      <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase text-center">
+                        7D Trend
+                      </th>
                       <th className="px-6 py-3 rounded-tr-xl"></th>
                     </tr>
                   </thead>
@@ -283,6 +293,9 @@ function WatchlistPage() {
                           </td>
                           <td className="px-6 py-4 text-right font-mono font-semibold dark:text-white">
                             ₹{stock.price}
+                          </td>
+                          <td className="px-6 py-4 flex justify-center">
+                            <Sparkline data={trends?.[stock.symbol] || []} />
                           </td>
                           <td className="px-6 py-4 text-right relative">
                             <button

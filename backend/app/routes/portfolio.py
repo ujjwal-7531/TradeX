@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from decimal import Decimal, ROUND_HALF_UP
 
@@ -125,3 +125,14 @@ def portfolio_summary(
         "net_worth": net_worth,
         "holdings": holdings_data
     }
+
+@router.get("/trends")
+def portfolio_trends(
+    symbols: list[str] = Query(default=[]),
+    user_id: int = Depends(get_current_user_id)
+):
+    from app.utils.market_data import get_sparkline_data
+    if not symbols:
+        return {}
+        
+    return get_sparkline_data(symbols, days=7)

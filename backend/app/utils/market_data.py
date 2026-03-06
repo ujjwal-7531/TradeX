@@ -46,3 +46,47 @@ def get_live_prices(symbols):
     except Exception as e:
         print(f"Global Error in fetching prices: {e}")
         return {s: 0.0 for s in symbols}
+
+def fetch_single_sparkline(sym, days=7):
+    """Worker function to fetch historical close prices for a symbol."""
+    try:
+        ticker = yf.Ticker(f"{sym}.NS")
+        # Fetch a few extra days to account for weekends and holidays
+        hist = ticker.history(period=f"{days + 5}d")
+        
+        if hist.empty:
+            return sym, []
+            
+        # Extract just the Close prices, rounded to 2 decimals
+        closes = [round(float(price), 2) for price in hist['Close']]
+        
+        # Return only the last `days` number of prices
+        return sym, closes[-days:]
+        
+    except Exception as e:
+        print(f"Error for sparkline {sym}: {e}")
+        return sym, []
+
+def get_sparkline_data(symbols, days=7):
+    """
+    Fetches historical closing prices concurrently for a list of symbols.
+    Returns a dictionary mapping symbols to arrays of historical prices.
+    """
+    if not symbols:
+        return {}
+        
+    sparkline_dict = {}
+    
+    try:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+            # We use a lambda to pass the `days` argument to the worker
+            results = executor.map(lambda sym: fetch_single_sparkline(sym, days), symbols)
+            
+            for sym, prices in results:
+                if prices: # Only add if we successfully got data
+                    sparkline_dict[sym] = prices
+                    
+        return sparkline_dict
+    except Exception as e:
+        print(f"Global Error in fetching sparklines: {e}")
+        return {s: [] for s in symbols}
