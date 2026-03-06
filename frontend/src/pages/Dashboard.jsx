@@ -8,9 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { fetchTransactions } from "../api/transactions";
 import TransactionsTable from "../components/TransactionsTable";
 import TopBar from "../components/TopBar";
-import MarketOverviewWidget from "../components/MarketOverviewWidget"; //for market overview widget
-
-
+import MarketOverviewWidget from "../components/MarketOverviewWidget";
+import StockHeatmap from "../components/StockHeatmap";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -36,7 +35,6 @@ function Dashboard() {
     refreshData();
   }, []);
 
-
   const handleLogout = () => {
     removeToken();
     navigate("/login");
@@ -56,18 +54,18 @@ function Dashboard() {
         refreshData={refreshData} // This is the key!
       />
 
-
       <div className="p-6 text-black dark:text-white">
         {/*portfolio summary*/}
         <PortfolioSummary data={data} />
+
+        {/* indian stock heatmap */}
+        <StockHeatmap isDark={isDark} />
 
         {/* market overview widget*/}
         <MarketOverviewWidget isDark={isDark} />
       </div>
     </div>
   );
-
-
 }
 
 export default Dashboard;
