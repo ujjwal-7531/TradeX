@@ -54,8 +54,8 @@ function Dashboard() {
       <div className="p-6 text-black dark:text-white">
         <PortfolioSummary data={data} />
         <PortfolioAnalytics holdings={data?.holdings} />
-        <StockHeatmap isDark={isDark} />
         <MarketOverviewWidget isDark={isDark} />
+        <StockHeatmap isDark={isDark} />
       </div>
     </div>
   );
