@@ -88,15 +88,16 @@ function TopBar({ email, onLogout, onToggleTheme, isDark, refreshData }) {
                 </p>
               </div>
 
-              <div className="py-1">
+              <div className="p-2 flex flex-col gap-1">
                 <button
                   onClick={() => {
                     onToggleTheme();
                     setOpen(false);
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="flex items-center w-full text-left px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
                 >
-                  {isDark ? "☀️ Light mode" : "🌙 Dark mode"}
+                  <span className="mr-3">{isDark ? "☀️" : "🌙"}</span>
+                  {isDark ? "Light mode" : "Dark mode"}
                 </button>
 
                 <button
@@ -104,18 +105,22 @@ function TopBar({ email, onLogout, onToggleTheme, isDark, refreshData }) {
                     setIsModalOpen(true);
                     setOpen(false);
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="flex items-center w-full text-left px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
                 >
-                  ⚙️ Edit balance
+                  <span className="mr-3">⚙️</span>
+                  Edit balance
                 </button>
+
+                <div className="h-px bg-gray-100 dark:bg-gray-700 my-1 mx-2"></div>
 
                 <button
                   onClick={() => {
                     onLogout();
                     setOpen(false);
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 border-t dark:border-gray-700"
+                  className="flex items-center w-full text-left px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
                 >
+                  <span className="mr-3 text-lg leading-none mb-0.5">🚪</span>
                   Logout
                 </button>
               </div>
