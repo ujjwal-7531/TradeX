@@ -41,9 +41,9 @@ function Signup() {
     }}
   >
     {/* Glassmorphism Card */}
-    <div className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-8 m-4">
+    <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-8 m-4">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
+        <h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">Create Account</h1>
         <p className="text-blue-200 text-sm">Join the community and start tracking your portfolio</p>
       </div>
 
@@ -85,7 +85,7 @@ function Signup() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg font-bold text-lg shadow-lg transform transition active:scale-95 disabled:opacity-50 mt-4"
+          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white py-3 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform transition-all duration-300 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 mt-4"
         >
           {loading ? "Creating Terminal..." : "Register Now"}
         </button>

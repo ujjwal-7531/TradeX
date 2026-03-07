@@ -70,7 +70,7 @@ function PortfolioAnalytics({ holdings }) {
 
   if (chartData.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow border border-gray-100 dark:border-gray-700 w-full my-8">
+      <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 w-full my-8 transition-all duration-300 hover:shadow-md">
         <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Portfolio Allocation</h3>
         <div className="flex flex-col items-center justify-center h-64 text-gray-400">
           <div className="text-4xl mb-3">🍩</div>
@@ -81,7 +81,7 @@ function PortfolioAnalytics({ holdings }) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow border border-gray-100 dark:border-gray-700 w-full my-8 flex flex-col md:flex-row gap-6 items-center">
+    <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 w-full my-8 flex flex-col md:flex-row gap-6 items-center transition-all duration-300 hover:shadow-md">
       {/* Chart Section */}
       <div className="w-full md:w-1/2 h-72">
         <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-white">Asset Allocation</h3>

@@ -49,7 +49,7 @@ function MarketOverviewWidget({ isDark }) {
   }, [isDark]); // Re-renders if you toggle theme
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded shadow p-4 mt-6">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mt-6 transition-all duration-300 hover:shadow-md">
       <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">
         Market Overview
       </h3>

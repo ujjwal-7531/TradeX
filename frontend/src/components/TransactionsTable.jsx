@@ -1,7 +1,7 @@
 function TransactionsTable({ transactions }) {
   if (!transactions || transactions.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow mt-6 text-center border border-gray-100 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 p-12 rounded-2xl shadow-sm mt-6 text-center border border-gray-100 dark:border-gray-700">
         <div className="text-4xl mb-3">📭</div>
         <p className="text-gray-500 dark:text-gray-400 font-medium">
           No transactions yet.
@@ -12,7 +12,7 @@ function TransactionsTable({ transactions }) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden w-full border border-gray-100 dark:border-gray-700">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden w-full border border-gray-100 dark:border-gray-700">
       {/* Hide the inner header if rendered inside the Transactions page, as the page already has a header */}
       {/* <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Recent Transactions</h3>
@@ -20,18 +20,18 @@ function TransactionsTable({ transactions }) {
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm border-collapse text-left whitespace-nowrap">
-          <thead>
-            <tr className="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider font-semibold border-b border-gray-200 dark:border-gray-700">
-              <th className="px-6 py-4">Action</th>
-              <th className="px-6 py-4">Stock</th>
-              <th className="px-6 py-4 text-right">Quantity</th>
-              <th className="px-6 py-4 text-right">Execution Price</th>
-              <th className="px-6 py-4 text-right">Total Value</th>
-              <th className="px-6 py-4 text-right">Date & Time</th>
+          <thead className="bg-gray-50/80 dark:bg-gray-800/80 text-left border-b border-gray-100 dark:border-gray-700">
+            <tr>
+              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Action</th>
+              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Stock</th>
+              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">Quantity</th>
+              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">Execution Price</th>
+              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">Total Value</th>
+              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">Date & Time</th>
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+          <tbody className="divide-y divide-gray-50 dark:divide-gray-800/50">
             {transactions.map((tx) => {
               const isBuy = tx.trade_type === "BUY";
               const typeColor = isBuy ? "text-emerald-700 dark:text-emerald-400" : "text-rose-700 dark:text-rose-400";
@@ -40,7 +40,7 @@ function TransactionsTable({ transactions }) {
               const totalValue = tx.quantity * tx.price;
 
               return (
-                <tr key={tx.id} className="group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                <tr key={tx.id} className="group hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors border-b border-gray-50 dark:border-gray-800/50 last:border-0">
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide ${typeColor} ${typeBg}`}>
                       {typeIcon} {tx.trade_type}

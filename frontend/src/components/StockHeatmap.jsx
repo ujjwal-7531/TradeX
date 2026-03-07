@@ -39,7 +39,7 @@ function StockHeatmap({ isDark }) {
   );
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow mt-6 mb-6 w-full h-[600px] flex flex-col transition-colors">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mt-6 mb-6 w-full h-[600px] flex flex-col transition-all duration-300 hover:shadow-md">
       <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Indian Stock Heatmap</h3>
       <div className="tradingview-widget-container flex-1 w-full" ref={container}>
       </div>

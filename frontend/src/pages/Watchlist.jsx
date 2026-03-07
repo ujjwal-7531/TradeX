@@ -161,12 +161,12 @@ function WatchlistPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* LEFT SIDEBAR: Watchlist Management */}
-        <div className="w-64 bg-white dark:bg-gray-800 border-r dark:border-gray-700 flex flex-col p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="font-bold text-gray-800 dark:text-white">
+        <div className="w-64 bg-gray-50/50 dark:bg-gray-900/50 border-r border-gray-100 dark:border-gray-800 flex flex-col p-4">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="font-extrabold text-gray-800 dark:text-white tracking-tight">
               My Watchlists
             </h2>
-            <span className="text-xs text-gray-400">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-200 dark:bg-gray-800 px-2 py-0.5 rounded-full">
               {watchlists.length}/10
             </span>
           </div>
@@ -179,26 +179,26 @@ function WatchlistPage() {
                 onChange={(e) => setNewListName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleCreate(e)} // Still works on Enter
                 placeholder="Name (e.g. Tech)"
-                className="flex-1 text-sm p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white outline-none focus:ring-1 focus:ring-blue-500"
+                className="flex-1 text-sm px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/40 transition-all shadow-sm"
               />
               <button
                 onClick={handleCreate}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-lg font-bold transition-colors"
+                className="bg-blue-600 hover:bg-blue-700 text-white w-9 h-9 rounded-lg flex items-center justify-center text-xl font-bold transition-all hover:scale-105 active:scale-95 shadow-sm"
                 title="Create Watchlist"
               >
                 +
               </button>
             </div>
             {watchlists.length >= 10 && (
-              <p className="text-[10px] text-red-500 italic">
+              <p className="text-[10px] text-red-500 font-medium">
                 Limit of 10 reached
               </p>
             )}
           </div>
 
-          <div className="flex-1 space-y-1 overflow-y-auto">
+          <div className="flex-1 space-y-1.5 overflow-y-auto pr-1 custom-scrollbar">
             {watchlists.length === 0 ? (
-              <p className="text-sm text-gray-400 italic text-center mt-4">
+              <p className="text-sm text-gray-400 italic text-center mt-8">
                 No watchlists yet
               </p>
             ) : (
@@ -206,10 +206,10 @@ function WatchlistPage() {
                 <div
                   key={list.id}
                   onClick={() => setSelectedId(list.id)}
-                  className={`flex justify-between items-center p-2 rounded cursor-pointer group transition-all ${
+                  className={`flex justify-between items-center px-3 py-2.5 rounded-lg cursor-pointer group transition-all duration-200 ${
                     selectedId === list.id
-                      ? "bg-blue-100 dark:bg-blue-900/40 text-blue-600 border-l-4 border-blue-600"
-                      : "hover:bg-gray-100 dark:hover:bg-blue-900/20 text-gray-600 dark:text-gray-300"
+                      ? "bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border border-gray-100 dark:border-gray-700 shadow-sm font-semibold border-l-4 border-l-blue-600 dark:border-l-blue-500"
+                      : "hover:bg-white dark:hover:bg-gray-800/80 text-gray-600 dark:text-gray-400 hover:shadow-sm border border-transparent"
                   }`}
                 >
                   <span className="truncate font-medium">{list.name}</span>
@@ -243,8 +243,8 @@ function WatchlistPage() {
           {selectedId ? (
             <div>
               {/* Header Area */}
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <div className="flex justify-between items-center mb-8">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                   {watchlists.find((w) => w.id === selectedId)?.name ||
                     "Watchlist"}
                 </h1>
@@ -257,32 +257,32 @@ function WatchlistPage() {
               </div>
 
               {/* Stocks Table */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow overflow-visible">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-visible mt-2">
                 <table className="w-full">
-                  <thead className="bg-gray-50 dark:bg-gray-700 text-left">
+                  <thead className="bg-gray-50/80 dark:bg-gray-800/80 text-left border-b border-gray-100 dark:border-gray-700">
                     <tr>
-                      <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase rounded-tl-xl">
+                      <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider rounded-tl-2xl">
                         Symbol
                       </th>
-                      <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                         Company
                       </th>
-                      <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase text-right">
+                      <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">
                         Price
                       </th>
-                      <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase text-center">
+                      <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-center">
                         7D Trend
                       </th>
-                      <th className="px-6 py-3 rounded-tr-xl"></th>
+                      <th className="px-6 py-4 rounded-tr-2xl"></th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y dark:divide-gray-700">
+                  <tbody className="divide-y divide-gray-50 dark:divide-gray-800/50">
                     {!currentWatchlist ||
                     currentWatchlist.stocks.length === 0 ? (
                       <tr>
                         <td
-                          colSpan="4"
-                          className="px-6 py-10 text-center text-gray-400 italic"
+                          colSpan="5"
+                          className="px-6 py-16 text-center text-gray-400"
                         >
                           No stocks in this watchlist yet. Use the search bar to
                           add some!

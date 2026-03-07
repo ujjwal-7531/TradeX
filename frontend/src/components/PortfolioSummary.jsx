@@ -3,9 +3,10 @@ import { fetchPortfolioSummary } from "../api/portfolio";
 
 function StatCard({ title, value, valueClass = "" }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded shadow p-4">
-      <p className="text-sm text-gray-500 dark:text-gray-400">{title}</p>
-      <p className={`text-xl font-semibold mt-1 ${valueClass}`}>{value}</p>
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-6 border border-gray-100 dark:border-gray-700 relative overflow-hidden group">
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent to-gray-50/50 dark:to-gray-700/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <p className="text-sm font-medium text-gray-500 dark:text-gray-400 relative z-10">{title}</p>
+      <p className={`text-2xl sm:text-3xl font-bold font-mono tracking-tight mt-2 relative z-10 ${valueClass}`}>{value}</p>
     </div>
   );
 }

@@ -72,11 +72,11 @@ function Transactions() {
         isDark={isDark}
       />
 
-      <div className="p-6 text-black dark:text-white">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Transaction History</h2>
+      <div className="p-6 sm:p-8 text-black dark:text-white max-w-7xl mx-auto flex flex-col gap-6">
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-3xl font-extrabold tracking-tight">Transaction History</h2>
 
-          <div className="flex items-center gap-2 bg-white dark:bg-gray-800 p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+          <div className="flex items-center gap-2 bg-white dark:bg-gray-800 p-1.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
             <label className="text-sm font-medium text-gray-500 dark:text-gray-400 pl-2">
               View
             </label>
@@ -97,10 +97,10 @@ function Transactions() {
           <button
             onClick={downloadCSV}
             disabled={downloading}
-            className={`flex items-center gap-2 px-4 py-2 font-medium text-sm rounded-lg transition-all ${
+            className={`flex items-center gap-2 px-5 py-2.5 font-bold text-sm rounded-xl transition-all duration-300 ${
               downloading 
                 ? "bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed border border-gray-200 dark:border-gray-700"
-                : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow active:scale-95"
+                : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
             }`}
           >
             {downloading ? (

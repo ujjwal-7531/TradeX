@@ -31,8 +31,6 @@ function Login() {
       setLoading(false);
     }
   };
-  const isLogin = true;
-
   return (
   <div 
     className="min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat"
@@ -41,12 +39,12 @@ function Login() {
     }}
   >
     {/* Glassmorphism Card */}
-    <div className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-8 m-4">
-      <h1 className="text-3xl font-bold text-center mb-2 text-white">
-        {isLogin ? "Welcome Back" : "Create Account"}
+    <div className="w-full max-w-md bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl p-8 m-4">
+      <h1 className="text-3xl font-extrabold text-center mb-2 text-white tracking-tight">
+        Welcome Back
       </h1>
       <p className="text-blue-200 text-center mb-8 text-sm">
-        {isLogin ? "Enter your credentials to access the terminal" : "Join the trading community today"}
+        Enter your credentials to access the terminal
       </p>
 
       {error && (
@@ -87,20 +85,20 @@ function Login() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg font-bold text-lg shadow-lg transform transition active:scale-95 disabled:opacity-50 mt-4"
+          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white py-3 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform transition-all duration-300 hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 mt-4"
         >
-          {loading ? "Processing..." : (isLogin ? "Sign In" : "Register")}
+          {loading ? "Processing..." : "Sign In"}
         </button>
       </form>
 
       <div className="mt-8 pt-6 border-t border-white/10 text-center">
         <p className="text-sm text-gray-300">
-          {isLogin ? "New to the platform?" : "Already a member?"}
+          New to the platform?
           <button
-            onClick={() => navigate(isLogin ? "/signup" : "/login")}
+            onClick={() => navigate("/signup")}
             className="ml-2 text-blue-400 font-bold hover:text-blue-300 transition-colors"
           >
-            {isLogin ? "Create an account" : "Log in here"}
+            Create an account
           </button>
         </p>
       </div>
