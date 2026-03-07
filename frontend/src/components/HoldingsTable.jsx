@@ -1,8 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sparkline from "./Sparkline";
 
 function HoldingsTable({ holdings, trends, onAction }) {
   const [openMenu, setOpenMenu] = useState(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.action-menu-container')) {
+        setOpenMenu(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   if (!holdings || holdings.length === 0) {
     return (
@@ -70,7 +80,7 @@ function HoldingsTable({ holdings, trends, onAction }) {
                 <td className="px-6 py-4 flex justify-center">
                   <Sparkline data={trends?.[h.symbol] || []} />
                 </td>
-                <td className="px-6 py-4 text-right relative">
+                <td className="px-6 py-4 text-right relative action-menu-container">
                   <button
                     onClick={() => setOpenMenu(openMenu === h.symbol ? null : h.symbol)}
                     className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"

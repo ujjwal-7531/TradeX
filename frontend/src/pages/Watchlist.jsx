@@ -77,6 +77,16 @@ function WatchlistPage() {
     loadSidebar();
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.action-menu-container')) {
+        setOpenMenu(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   // 1. Automatically load details when selectedId changes
   useEffect(() => {
     if (selectedId) {
@@ -297,7 +307,7 @@ function WatchlistPage() {
                           <td className="px-6 py-4 flex justify-center">
                             <Sparkline data={trends?.[stock.symbol] || []} />
                           </td>
-                          <td className="px-6 py-4 text-right relative">
+                          <td className="px-6 py-4 text-right relative action-menu-container">
                             <button
                               onClick={() => setOpenMenu(openMenu === stock.symbol ? null : stock.symbol)}
                               className="px-2 py-1 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
