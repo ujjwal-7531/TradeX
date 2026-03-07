@@ -3,7 +3,7 @@ import api from "../api/axios";
 import { fetchTransactions } from "../api/transactions";
 import TransactionsTable from "../components/TransactionsTable";
 import TopBar from "../components/TopBar";
-import { removeToken } from "../utils/auth";
+import { removeToken, getEmail } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 
 function Transactions() {
@@ -66,7 +66,7 @@ function Transactions() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       <TopBar
-        email="user@example.com"
+        email={getEmail() || "user@example.com"}
         onLogout={handleLogout}
         onToggleTheme={toggleTheme}
         isDark={isDark}

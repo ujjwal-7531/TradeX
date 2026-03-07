@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
-import { setToken } from "../utils/auth";
+import { setToken, setEmail as setAuthEmail } from "../utils/auth";
 import toast from "react-hot-toast";
 import tradingBg from "../assets/bg.jpg";
 
@@ -23,6 +23,7 @@ function Login() {
       });
 
       setToken(res.data.access_token);
+      setAuthEmail(res.data.email);
       toast.success("Welcome back!");
       navigate("/dashboard"); 
     } catch (err) {

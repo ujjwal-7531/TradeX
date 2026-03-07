@@ -5,7 +5,7 @@ import HoldingsTable from "../components/HoldingsTable";
 import TopBar from "../components/TopBar";
 import BuySellCard from "../components/BuySellCard";
 import TradingViewChart from "../components/TradingViewChart";
-import { removeToken } from "../utils/auth";
+import { removeToken, getEmail } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 
 function Holdings() {
@@ -52,7 +52,7 @@ function Holdings() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-      <TopBar email="user@example.com" onLogout={() => { removeToken(); navigate("/login"); }} onToggleTheme={toggleTheme} isDark={isDark} />
+      <TopBar email={getEmail() || "user@example.com"} onLogout={() => { removeToken(); navigate("/login"); }} onToggleTheme={toggleTheme} isDark={isDark} />
       
       <div className="p-6 text-black dark:text-white flex flex-col gap-6">
         <PortfolioSummary data={data} />

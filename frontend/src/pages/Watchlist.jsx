@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { removeToken } from "../utils/auth";
+import { removeToken, getEmail } from "../utils/auth";
 import TopBar from "../components/TopBar";
 import BuySellCard from "../components/BuySellCard";
 import TradingViewChart from "../components/TradingViewChart";
@@ -152,7 +152,7 @@ function WatchlistPage() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col">
       <TopBar
-        email="user@example.com" // You can replace this with real user data later
+        email={getEmail() || "user@example.com"}
         onLogout={handleLogout}
         onToggleTheme={toggleTheme}
         isDark={isDark}

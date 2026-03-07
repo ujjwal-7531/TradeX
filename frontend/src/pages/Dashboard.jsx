@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { fetchPortfolioSummary } from "../api/portfolio";
 import PortfolioSummary from "../components/PortfolioSummary";
 
-import { removeToken } from "../utils/auth";
+import { removeToken, getEmail } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 import { fetchTransactions } from "../api/transactions";
 import TransactionsTable from "../components/TransactionsTable";
@@ -48,7 +48,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       <TopBar
-        email="user@example.com" // You can replace this with real user data later
+        email={getEmail() || "user@example.com"}
         onLogout={handleLogout}
         onToggleTheme={toggleTheme}
         isDark={isDark}
