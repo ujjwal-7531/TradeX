@@ -1,12 +1,17 @@
-import { useEffect, useRef, useState } from "react"; // Single import for useState
+import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import EditBalanceModal from "./EditBalanceModal";
+import ProfileModal from "./ProfileModal";
 import { updateBalance } from "../api/portfolio";
+import { getFullName, getProfilePicture } from "../utils/auth";
 
 // Added refreshData here so the component can use it
 function TopBar({ email, onLogout, onToggleTheme, isDark, refreshData }) {
   const [open, setOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [profilePic, setProfilePic] = useState(getProfilePicture());
+  const [fullName, setFullName] = useState(getFullName());
   const dropdownRef = useRef(null);
 
   const navLinkClass = ({ isActive }) =>
@@ -72,9 +77,15 @@ function TopBar({ email, onLogout, onToggleTheme, isDark, refreshData }) {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setOpen((prev) => !prev)}
-            className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white flex items-center justify-center font-semibold focus:outline-none focus:ring-4 focus:ring-blue-500/30 transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/20"
+            className="w-10 h-10 rounded-full bg-gradient-to-br border-2 border-white/20 from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white flex items-center justify-center font-semibold focus:outline-none focus:ring-4 focus:ring-blue-500/30 transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/20 overflow-hidden"
           >
-            {email?.[0]?.toUpperCase() || "U"}
+            {profilePic ? (
+              <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
+            ) : fullName ? (
+              fullName.charAt(0).toUpperCase()
+            ) : (
+              "u"
+            )}
           </button>
 
           {open && (
@@ -84,11 +95,22 @@ function TopBar({ email, onLogout, onToggleTheme, isDark, refreshData }) {
                   Signed in as
                 </p>
                 <p className="text-sm font-medium text-black dark:text-white truncate">
-                  {email}
+                  {fullName || email}
                 </p>
               </div>
 
               <div className="p-2 flex flex-col gap-1">
+                <button
+                  onClick={() => {
+                    setIsProfileModalOpen(true);
+                    setOpen(false);
+                  }}
+                  className="flex items-center w-full text-left px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
+                >
+                  <span className="mr-3">👤</span>
+                  Profile Settings
+                </button>
+
                 <button
                   onClick={() => {
                     onToggleTheme();
@@ -133,6 +155,15 @@ function TopBar({ email, onLogout, onToggleTheme, isDark, refreshData }) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onUpdate={handleUpdateBalance}
+      />
+
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        onUpdateProfile={(data) => {
+          setFullName(data.name);
+          setProfilePic(data.picture);
+        }}
       />
     </div>
   );

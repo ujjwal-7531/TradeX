@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DECIMAL, DateTime
+from sqlalchemy import Column, Integer, String, DECIMAL, DateTime, Text
 from sqlalchemy.orm import relationship
 from app.database import Base
 from datetime import datetime, timezone
@@ -10,6 +10,8 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
     virtual_balance = Column(DECIMAL(15, 2), default=1000000.00, nullable=False)
+    full_name = Column(String(255), nullable=True)
+    profile_picture_url = Column(Text, nullable=True)
     created_at = Column(
         DateTime(timezone=True),
         nullable=False,

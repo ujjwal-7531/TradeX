@@ -66,7 +66,9 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "email": db_user.email
+        "email": db_user.email,
+        "full_name": db_user.full_name,
+        "profile_picture_url": db_user.profile_picture_url
     }
 
 @router.post("/token")
