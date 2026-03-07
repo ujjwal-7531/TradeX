@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { fetchTransactions } from "../api/transactions";
 import TransactionsTable from "../components/TransactionsTable";
+import { TransactionsTableSkeleton } from "../components/Skeletons";
 import TopBar from "../components/TopBar";
 import { removeToken, getEmail } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
@@ -121,7 +122,9 @@ function Transactions() {
         </div>
 
         {loading ? (
-          <p className="text-gray-500">Loading history...</p>
+          <div className="w-full">
+            <TransactionsTableSkeleton />
+          </div>
         ) : (
           <div className="w-full">
             <TransactionsTable transactions={transactions} />

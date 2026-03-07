@@ -31,7 +31,7 @@ function Dashboard() {
     fetchPortfolioSummary().then(setData);
     fetchTransactions(5, 0).then(setTransactions);
   };
-  // Fetch data on mount
+
   useEffect(() => {
     refreshData();
   }, []);
@@ -41,10 +41,6 @@ function Dashboard() {
     navigate("/login");
   };
 
-  if (!data) {
-    return <p className="p-6 text-gray-500">Loading dashboard...</p>;
-  }
-
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       <TopBar
@@ -52,20 +48,13 @@ function Dashboard() {
         onLogout={handleLogout}
         onToggleTheme={toggleTheme}
         isDark={isDark}
-        refreshData={refreshData} // This is the key!
+        refreshData={refreshData}
       />
 
       <div className="p-6 text-black dark:text-white">
-        {/*portfolio summary*/}
         <PortfolioSummary data={data} />
-
-        {/* portfolio analytics donut chart */}
-        <PortfolioAnalytics holdings={data.holdings} />
-
-        {/* indian stock heatmap */}
+        <PortfolioAnalytics holdings={data?.holdings} />
         <StockHeatmap isDark={isDark} />
-
-        {/* market overview widget*/}
         <MarketOverviewWidget isDark={isDark} />
       </div>
     </div>

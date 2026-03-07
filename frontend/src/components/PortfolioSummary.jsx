@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { fetchPortfolioSummary } from "../api/portfolio";
+import { StatCardSkeleton } from "./Skeletons";
 
 function StatCard({ title, value, valueClass = "" }) {
   return (
@@ -11,22 +12,18 @@ function StatCard({ title, value, valueClass = "" }) {
   );
 }
 
-function PortfolioSummary() {
-  const [data, setData] = useState(null);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    fetchPortfolioSummary()
-      .then(setData)
-      .catch(() => setError("Failed to load portfolio summary"));
-  }, []);
-
-  if (error) {
-    return <p className="text-red-500">{error}</p>;
-  }
+function PortfolioSummary({ data }) {
+  // Remove early return and fetch effect from here (lifted up)
 
   if (!data) {
-    return <p className="text-gray-500">Loading portfolio...</p>;
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+      </div>
+    );
   }
 
   const pnlColor =

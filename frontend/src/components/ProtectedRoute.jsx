@@ -3,7 +3,6 @@ import { getToken } from "../utils/auth";
 
 function ProtectedRoute({ children }) {
   const token = getToken();
-  console.log("ProtectedRoute token:", token);
 
   if (!token) {
     return <Navigate to="/login" replace />;

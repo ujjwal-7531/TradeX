@@ -46,7 +46,7 @@ function TopBar({ email, onLogout, onToggleTheme, isDark, refreshData }) {
       alert("Error updating balance. Please try again.");
     }
   };
-// testing
+
   return (
     <div className="flex justify-between items-center px-6 py-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b dark:border-gray-800 sticky top-0 z-40 transition-colors duration-300">
       {/* Left: Brand/Logo */}

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { fetchPortfolioSummary, fetchStockTrends } from "../api/portfolio";
 import PortfolioSummary from "../components/PortfolioSummary";
 import HoldingsTable from "../components/HoldingsTable";
+import { HoldingsTableSkeleton } from "../components/Skeletons";
 import TopBar from "../components/TopBar";
 import BuySellCard from "../components/BuySellCard";
 import TradingViewChart from "../components/TradingViewChart";
@@ -48,8 +49,6 @@ function Holdings() {
     }
   };
 
-  if (!data) return <p className="p-6 text-gray-500">Loading holdings...</p>;
-
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       <TopBar email={getEmail() || "user@example.com"} onLogout={() => { removeToken(); navigate("/login"); }} onToggleTheme={toggleTheme} isDark={isDark} />
@@ -67,7 +66,11 @@ function Holdings() {
           />
         )}
 
-        <HoldingsTable holdings={data.holdings} trends={trends} onAction={handleAction} />
+        {!data ? (
+          <HoldingsTableSkeleton />
+        ) : (
+          <HoldingsTable holdings={data.holdings} trends={trends} onAction={handleAction} />
+        )}
       </div>
     </div>
   );

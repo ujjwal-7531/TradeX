@@ -5,13 +5,8 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Transactions from "./pages/Transactions";
-
-// Temporary placeholders for the new pages 
-// (You can later move these to actual files in /pages)
-import HoldingsTable from "./components/HoldingsTable";
-import TransactionsTable from "./components/TransactionsTable";
-import Holdings from "./pages/Holdings"; // Import the new page
-import Watchlist from "./pages/Watchlist"
+import Holdings from "./pages/Holdings";
+import Watchlist from "./pages/Watchlist";
 
 function App() {
   return (
@@ -45,21 +40,14 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Protected Routes Wrapper */}
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         
-        {/* New Navigation Routes */}
         <Route path="/holdings" element={
             <ProtectedRoute>
-              <Holdings /> {/* Use the full page component now */}
+              <Holdings />
             </ProtectedRoute>
         } />
         
-        {/* <Route path="/transactions" element={
-          <ProtectedRoute>
-            <div className="p-6"><TransactionsTable /></div>
-          </ProtectedRoute>
-        } /> */}
         <Route path="/transactions" element={
           <ProtectedRoute>
             <Transactions />
@@ -67,13 +55,13 @@ function App() {
         } />
 
         <Route 
-  path="/watchlist" 
-  element={
-    <ProtectedRoute>
-      <Watchlist />
-    </ProtectedRoute>
-  } 
-/>
+          path="/watchlist" 
+          element={
+            <ProtectedRoute>
+              <Watchlist />
+            </ProtectedRoute>
+          } 
+        />
         </Routes>
       </BrowserRouter>
     </>

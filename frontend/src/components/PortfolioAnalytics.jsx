@@ -4,9 +4,9 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
-  Tooltip,
-  Legend
+  Tooltip
 } from 'recharts';
+import { PortfolioAnalyticsSkeleton } from "./Skeletons";
 
 // A curated list of premium financial UI colors for the donut slices
 const COLORS = [
@@ -68,6 +68,12 @@ function PortfolioAnalytics({ holdings }) {
       .sort((a, b) => b.value - a.value); // Largest slice first
   }, [holdings]);
 
+  // If holdings is null/undefined, we are still loading from API
+  if (!holdings) {
+    return <PortfolioAnalyticsSkeleton />;
+  }
+
+  // If loaded but empty
   if (chartData.length === 0) {
     return (
       <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 w-full my-8 transition-all duration-300 hover:shadow-md">

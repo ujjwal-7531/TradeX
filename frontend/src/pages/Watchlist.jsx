@@ -13,6 +13,7 @@ import {
   removeStockFromWatchlist,
   fetchWatchlistById,
 } from "../api/watchlists";
+import { WatchlistTableSkeleton } from "../components/Skeletons";
 import StockSearch from "../components/SearchStock";
 import { useNavigate } from "react-router-dom";
 import api from '../api/axios';
@@ -24,6 +25,7 @@ function WatchlistPage() {
   const [watchlists, setWatchlists] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [currentWatchlist, setCurrentWatchlist] = useState(null);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [newListName, setNewListName] = useState("");
   const [openMenu, setOpenMenu] = useState(null);
   const [tradeOpen, setTradeOpen] = useState(false);
@@ -60,6 +62,7 @@ function WatchlistPage() {
 
   const loadWatchlistDetails = async () => {
     if (!selectedId) return;
+    setIsLoadingDetails(true);
     try {
       const data = await fetchWatchlistById(selectedId);
       setCurrentWatchlist(data);
@@ -70,6 +73,8 @@ function WatchlistPage() {
       }
     } catch (err) {
       console.error("Error loading stocks:", err);
+    } finally {
+      setIsLoadingDetails(false);
     }
   };
 
@@ -87,7 +92,6 @@ function WatchlistPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 1. Automatically load details when selectedId changes
   useEffect(() => {
     if (selectedId) {
       loadWatchlistDetails();
@@ -103,10 +107,9 @@ function WatchlistPage() {
 
     try {
       await createWatchlist(trimmedName);
-      setNewListName(""); // ONLY clear if successful
-      await loadSidebar(); // Refresh the list
+      setNewListName("");
+      await loadSidebar();
     } catch (err) {
-      // This will alert you to the EXACT reason for the 422
       console.error("Validation Error:", err.response?.data);
       alert(`Error: ${JSON.stringify(err.response?.data?.detail)}`);
     }
@@ -123,7 +126,6 @@ function WatchlistPage() {
   const handleRemoveStock = async (symbol) => {
     try {
       await api.delete(`/watchlists/${selectedId}/stocks/${symbol}`);
-      // Refresh the table immediately after removal
       loadWatchlistDetails();
     } catch (err) {
       console.error("Failed to remove stock:", err);
@@ -144,7 +146,6 @@ function WatchlistPage() {
   };
 
   const refreshData = () => {
-    // Only used to pass to TopBar, though fetchPortfolioSummary is unused in this UI
     fetchPortfolioSummary();
     fetchTransactions(10, 0);
   };
@@ -156,7 +157,7 @@ function WatchlistPage() {
         onLogout={handleLogout}
         onToggleTheme={toggleTheme}
         isDark={isDark}
-        refreshData={refreshData} // This is the key!
+        refreshData={refreshData}
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -257,8 +258,11 @@ function WatchlistPage() {
               </div>
 
               {/* Stocks Table */}
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-visible mt-2">
-                <table className="w-full">
+              {isLoadingDetails ? (
+                <WatchlistTableSkeleton />
+              ) : (
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-visible mt-2">
+                  <table className="w-full">
                   <thead className="bg-gray-50/80 dark:bg-gray-800/80 text-left border-b border-gray-100 dark:border-gray-700">
                     <tr>
                       <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider rounded-tl-2xl">
@@ -363,6 +367,7 @@ function WatchlistPage() {
                   </tbody>
                 </table>
               </div>
+              )}
             </div>
           ) : (
             /* Empty State when nothing is selected */

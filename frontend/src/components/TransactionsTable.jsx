@@ -13,11 +13,6 @@ function TransactionsTable({ transactions }) {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden w-full border border-gray-100 dark:border-gray-700">
-      {/* Hide the inner header if rendered inside the Transactions page, as the page already has a header */}
-      {/* <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Recent Transactions</h3>
-      </div> */}
-
       <div className="overflow-x-auto">
         <table className="w-full text-sm border-collapse text-left whitespace-nowrap">
           <thead className="bg-gray-50/80 dark:bg-gray-800/80 text-left border-b border-gray-100 dark:border-gray-700">
