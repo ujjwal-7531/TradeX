@@ -2,19 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { setToken } from "../utils/auth";
+import toast from "react-hot-toast";
 import tradingBg from "../assets/bg.jpg";
 
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
@@ -24,9 +23,10 @@ function Login() {
       });
 
       setToken(res.data.access_token);
-      navigate("/dashboard"); // 👈 THIS WAS MISSING
+      toast.success("Welcome back!");
+      navigate("/dashboard"); 
     } catch (err) {
-      setError("Invalid email or password");
+      toast.error("Invalid email or password");
     } finally {
       setLoading(false);
     }
@@ -46,12 +46,6 @@ function Login() {
       <p className="text-blue-200 text-center mb-8 text-sm">
         Enter your credentials to access the terminal
       </p>
-
-      {error && (
-        <div className="mb-6 text-sm text-red-200 bg-red-900/50 border border-red-500/50 p-3 rounded-lg text-center">
-          {error}
-        </div>
-      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>

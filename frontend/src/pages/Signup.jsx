@@ -1,19 +1,18 @@
 import { useState } from "react";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import tradingBg from "../assets/bg.jpg";
 
 function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
@@ -21,13 +20,14 @@ function Signup() {
         email,
         password,
       });
-
+      
+      toast.success("Account created successfully!");
       navigate("/login");
     } catch (err) {
       if (err.response?.data?.detail) {
-        setError(err.response.data.detail);
+        toast.error(err.response.data.detail);
       } else {
-        setError("Signup failed");
+        toast.error("Signup failed. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -46,12 +46,6 @@ function Signup() {
         <h1 className="text-3xl font-extrabold text-white mb-2 tracking-tight">Create Account</h1>
         <p className="text-blue-200 text-sm">Join the community and start tracking your portfolio</p>
       </div>
-
-      {error && (
-        <div className="mb-6 text-sm text-red-200 bg-red-900/50 border border-red-500/50 p-3 rounded-lg text-center">
-          {error}
-        </div>
-      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
