@@ -27,19 +27,7 @@ function MarketOverviewWidget({ isDark }) {
         {
           "title": "Indices",
           "symbols": [
-            { "s": "INDEX:SENSEX", "d": "Sensex" },
-            { "s": "NSE:NIFTY", "d": "Nifty 50" },
-            { "s": "NSE:BANKNIFTY", "d": "Bank Nifty" }
-            
-          ]
-        },
-        {
-          "title": "Top Stocks",
-          "symbols": [
-            { "s": "NSE:RELIANCE" },
-            { "s": "NSE:HDFCBANK" },
-            { "s": "NSE:TCS" },
-            { "s": "NSE:INFY" }
+            { "s": "INDEX:SENSEX", "d": "Sensex" }
           ]
         }
       ]
