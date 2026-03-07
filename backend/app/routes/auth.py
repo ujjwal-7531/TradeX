@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -7,6 +7,7 @@ from app.models.user import User
 from app.schemas.user import UserCreate, UserLogin
 from app.core.security import hash_password, verify_password, create_access_token
 from app.models.portfolio import Portfolio
+from app.services.email import send_welcome_email
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -20,7 +21,11 @@ def get_db():
 
 
 @router.post("/signup")
-def signup(user: UserCreate, db: Session = Depends(get_db)):
+def signup(
+    user: UserCreate, 
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -40,6 +45,9 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
 
     db.add(portfolio)
     db.commit()
+
+    # Trigger welcome email asynchronously
+    background_tasks.add_task(send_welcome_email, new_user.email)
 
     return {"message": "User created successfully"}
 
