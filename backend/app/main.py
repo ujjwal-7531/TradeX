@@ -16,6 +16,7 @@ from app.routes.settings import router as settings_router
 from app.routes.user import router as user_router
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import watchlists, stocks  # Import your new stocks router
+import os
 
 app = FastAPI(title="backend")
 
@@ -26,6 +27,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        os.getenv("FRONTEND_URL", "https://tradex.vercel.app") # Default fallback for later, but can be overridden
     ],
     allow_credentials=True,
     allow_methods=["*"],
