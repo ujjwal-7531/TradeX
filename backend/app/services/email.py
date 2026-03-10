@@ -9,6 +9,104 @@ load_dotenv()
 SMTP_EMAIL = os.getenv("SMTP_EMAIL")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 
+def send_otp_email(to_email: str, otp: str):
+    print(f"Began sending OTP email to {to_email}")
+    if not SMTP_EMAIL or not SMTP_PASSWORD:
+        print("SMTP config disabled or missing. Skipping email sending.")
+        return
+
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = f"TradeX <{SMTP_EMAIL}>"
+        msg['To'] = to_email
+        msg['Subject'] = "Verify your TradeX Account"
+
+        verification_link = f"http://localhost:5173/verify-otp?email={to_email}&otp={otp}"
+
+        text_body = f"""
+        Hello!
+        
+        Welcome to TradeX. To verify your account, please enter the following OTP: {otp}
+        
+        Or click this link to verify automatically:
+        {verification_link}
+        
+        This OTP is valid for 10 minutes.
+        
+        Thanks,
+        The TradeX Team
+        """
+        
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: #f3f4f6;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f3f4f6; padding: 40px 0;">
+                <tr>
+                    <td align="center">
+                        <table width="100%" max-width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 0 auto;">
+                            <tr>
+                                <td align="center" style="background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%); padding: 40px 20px;">
+                                    <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">TradeX</h1>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 40px 40px 20px 40px;">
+                                    <h2 style="color: #111827; margin: 0 0 20px 0; font-size: 24px; font-weight: 700;">Verify Your Email</h2>
+                                    <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+                                        Thank you for signing up! Please enter the following 6-digit OTP to verify your account:
+                                    </p>
+                                    <div style="text-align: center; margin: 30px 0;">
+                                        <span style="font-size: 32px; font-weight: 700; color: #2563eb; letter-spacing: 4px; background: #eff6ff; padding: 10px 20px; border-radius: 8px;">{otp}</span>
+                                    </div>
+                                    <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin: 0 0 30px 0; text-align: center;">
+                                        Or verify automatically by clicking the button below:
+                                    </p>
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tr>
+                                            <td align="center">
+                                                <a href="{verification_link}" style="display: inline-block; background-color: #2563eb; color: #ffffff; font-weight: 600; font-size: 16px; text-decoration: none; padding: 14px 32px; border-radius: 8px; transition: background-color 0.2s;">
+                                                    Verify Email Now
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center" style="background-color: #f9fafb; padding: 30px 20px; border-top: 1px solid #e5e7eb;">
+                                    <p style="color: #6b7280; font-size: 14px; margin: 0 0 10px 0;">
+                                        This code will expire in 10 minutes.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        """
+        
+        msg.attach(MIMEText(text_body, 'plain'))
+        msg.attach(MIMEText(html_body, 'html'))
+
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(SMTP_EMAIL, SMTP_PASSWORD)
+        
+        text = msg.as_string()
+        server.sendmail(SMTP_EMAIL, to_email, text)
+        server.quit()
+        
+        print(f"Sent OTP email successfully to {to_email}")
+    except Exception as e:
+        print(f"Failed to send email to {to_email}: {e}")
+
 def send_welcome_email(to_email: str):
     print(f"Began sending welcome email to {to_email}")
     if not SMTP_EMAIL or not SMTP_PASSWORD:

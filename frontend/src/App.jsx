@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Transactions from "./pages/Transactions";
 import Holdings from "./pages/Holdings";
 import Watchlist from "./pages/Watchlist";
+import VerifyOTP from "./pages/VerifyOTP";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
           <Route path="/" element={<Navigate to="/dashboard" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/verify-otp" element={<VerifyOTP />} />
 
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         

@@ -21,8 +21,8 @@ function Signup() {
         password,
       });
       
-      toast.success("Account created successfully!");
-      navigate("/login");
+      toast.success("Account created! Please check your email for the OTP.");
+      navigate("/verify-otp", { state: { email } });
     } catch (err) {
       if (err.response?.data?.detail) {
         toast.error(err.response.data.detail);

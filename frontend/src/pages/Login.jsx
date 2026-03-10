@@ -29,7 +29,11 @@ function Login() {
       toast.success("Welcome back!");
       navigate("/dashboard"); 
     } catch (err) {
-      toast.error("Invalid email or password");
+      if (err.response?.data?.detail === "Email not verified") {
+        toast.error("Please verify your email first.");
+      } else {
+        toast.error("Invalid email or password");
+      }
     } finally {
       setLoading(false);
     }
@@ -96,6 +100,21 @@ function Login() {
             className="ml-2 text-blue-400 font-bold hover:text-blue-300 transition-colors"
           >
             Create an account
+          </button>
+        </p>
+        <p className="text-sm text-gray-300 mt-2">
+          Forgot to verify your email?
+          <button
+            onClick={() => {
+              if (email) {
+                navigate(`/verify-otp?email=${encodeURIComponent(email)}`);
+              } else {
+                toast.error("Please enter your email above first.");
+              }
+            }}
+            className="ml-2 text-indigo-400 font-bold hover:text-indigo-300 transition-colors"
+          >
+            Verify Now
           </button>
         </p>
       </div>
