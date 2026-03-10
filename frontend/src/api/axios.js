@@ -18,7 +18,8 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response && error.response.status === 401) {
+    // If we receive a 401 Unauthorized, and it wasn't during a login attempt
+    if (error.response && error.response.status === 401 && error.config.url !== "/auth/login") {
       // Global handling for expired/invalid tokens
       removeToken();
       window.location.href = "/login";

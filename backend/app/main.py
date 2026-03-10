@@ -16,8 +16,13 @@ from app.routes.settings import router as settings_router
 from app.routes.user import router as user_router
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import watchlists, stocks  # Import your new stocks router
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from app.core.limiter import limiter
 
 app = FastAPI(title="backend")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 Base.metadata.create_all(bind=engine)
 

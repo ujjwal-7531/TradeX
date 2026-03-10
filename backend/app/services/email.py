@@ -31,7 +31,7 @@ def send_otp_email(to_email: str, otp: str):
         Or click this link to verify automatically:
         {verification_link}
         
-        This OTP is valid for 10 minutes.
+        This OTP is valid for 5 minutes.
         
         Thanks,
         The TradeX Team
@@ -80,7 +80,7 @@ def send_otp_email(to_email: str, otp: str):
                             <tr>
                                 <td align="center" style="background-color: #f9fafb; padding: 30px 20px; border-top: 1px solid #e5e7eb;">
                                     <p style="color: #6b7280; font-size: 14px; margin: 0 0 10px 0;">
-                                        This code will expire in 10 minutes.
+                                        This code will expire in 5 minutes.
                                     </p>
                                 </td>
                             </tr>

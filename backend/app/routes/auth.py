@@ -8,6 +8,8 @@ from app.schemas.user import UserCreate, UserLogin, OTPVerify
 from app.core.security import hash_password, verify_password, create_access_token
 from app.models.portfolio import Portfolio
 from app.services.email import send_welcome_email, send_otp_email
+from app.core.limiter import limiter
+from fastapi import Request
 import random
 import string
 from datetime import datetime, timedelta, timezone
@@ -24,7 +26,9 @@ def get_db():
 
 
 @router.post("/signup")
+@limiter.limit("3/minute")
 def signup(
+    request: Request,
     user: UserCreate, 
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
@@ -34,7 +38,7 @@ def signup(
         raise HTTPException(status_code=400, detail="Email already registered")
 
     otp = ''.join(random.choices(string.digits, k=6))
-    otp_expires_at = datetime.now(timezone.utc) + timedelta(minutes=10)
+    otp_expires_at = datetime.now(timezone.utc) + timedelta(minutes=5)
 
     new_user = User(
         email=user.email,
@@ -62,7 +66,8 @@ def signup(
 
 
 @router.post("/login")
-def login(user: UserLogin, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def login(request: Request, user: UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(
         User.email == user.email
     ).first()
@@ -164,7 +169,9 @@ from pydantic import EmailStr
 from typing import Dict
 
 @router.post("/resend-otp")
+@limiter.limit("1/minute")
 def resend_otp(
+    request: Request,
     body: dict,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
@@ -182,7 +189,7 @@ def resend_otp(
         raise HTTPException(status_code=400, detail="Email is already verified")
         
     otp = ''.join(random.choices(string.digits, k=6))
-    otp_expires_at = datetime.now(timezone.utc) + timedelta(minutes=10)
+    otp_expires_at = datetime.now(timezone.utc) + timedelta(minutes=5)
     
     db_user.verification_otp = otp
     db_user.otp_expires_at = otp_expires_at

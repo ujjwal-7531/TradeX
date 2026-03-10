@@ -17,6 +17,20 @@ function VerifyOTP() {
   const [otp, setOtp] = useState(initialOtp);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
+  const [resendTimer, setResendTimer] = useState(60);
+
+  // Timer countdown hook
+  useEffect(() => {
+    let interval = null;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    } else if (resendTimer <= 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   // If both email and otp are present in the URL on mount, automatically verify.
   useEffect(() => {
@@ -64,6 +78,7 @@ function VerifyOTP() {
       await api.post("/auth/resend-otp", { email });
       toast.success("A new OTP has been sent to your email.");
       setOtp(""); // Clear existing OTP input
+      setResendTimer(60); // Reset the 60 second timer
     } catch (err) {
       if (err.response?.data?.detail) {
         toast.error(err.response.data.detail);
@@ -129,10 +144,19 @@ function VerifyOTP() {
         <div className="mt-6 text-center">
           <button
             onClick={handleResend}
-            disabled={resending || loading}
-            className="text-sm text-blue-300 hover:text-blue-200 transition-colors disabled:opacity-50 font-medium"
+            disabled={resending || loading || resendTimer > 0}
+            className={`text-sm font-medium transition-colors ${
+              resendTimer > 0 
+                ? "text-gray-400 cursor-not-allowed" 
+                : "text-blue-300 hover:text-blue-200"
+            }`}
           >
-            {resending ? "Sending..." : "Didn't receive the code? Resend OTP"}
+            {resending 
+              ? "Sending..." 
+              : resendTimer > 0 
+                ? `Resend OTP in ${resendTimer}s` 
+                : "Didn't receive the code? Resend OTP"
+            }
           </button>
         </div>
 
