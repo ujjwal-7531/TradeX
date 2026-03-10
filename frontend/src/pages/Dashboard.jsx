@@ -6,7 +6,6 @@ import PortfolioSummary from "../components/PortfolioSummary";
 import { removeToken, getEmail } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 import { fetchTransactions } from "../api/transactions";
-import TransactionsTable from "../components/TransactionsTable";
 import TopBar from "../components/TopBar";
 import MarketOverviewWidget from "../components/MarketOverviewWidget";
 import StockHeatmap from "../components/StockHeatmap";

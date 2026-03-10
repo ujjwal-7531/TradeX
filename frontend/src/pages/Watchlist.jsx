@@ -7,10 +7,8 @@ import { fetchPortfolioSummary } from "../api/portfolio";
 import { fetchTransactions} from "../api/transactions";
 import {
   fetchAllWatchlists,
-  fetchWatchlistDetail,
   createWatchlist,
   deleteWatchlist,
-  removeStockFromWatchlist,
   fetchWatchlistById,
 } from "../api/watchlists";
 import { WatchlistTableSkeleton } from "../components/Skeletons";
