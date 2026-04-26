@@ -1,8 +1,8 @@
+import os
 from fastapi import FastAPI
 from app.database import engine, Base
 from app.models.user import User
 from app.routes.auth import router as auth_router
-from app.routes.test_protected import router as test_router
 from app.models.stock import Stock
 from app.models.watchlist import Watchlist
 from app.models.watchlist_stock import WatchlistStock
@@ -15,7 +15,7 @@ from app.routes.transactions import router as transactions_router
 from app.routes.settings import router as settings_router
 from app.routes.user import router as user_router
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import watchlists, stocks  # Import your new stocks router
+from app.routes import stocks
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from app.core.limiter import limiter
@@ -31,6 +31,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        os.getenv("FRONTEND_URL", "http://localhost:5173")
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -38,15 +39,13 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
-app.include_router(test_router)
 app.include_router(watchlists_router)
 app.include_router(trade_router)
 app.include_router(portfolio_router)
 app.include_router(transactions_router)
 app.include_router(settings_router)
 app.include_router(user_router)
-app.include_router(watchlists.router)
-app.include_router(stocks.router)  # Add this line
+app.include_router(stocks.router)
 
 @app.get("/")
 def root():

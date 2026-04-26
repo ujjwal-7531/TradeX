@@ -76,6 +76,7 @@ function WatchlistPage() {
     }
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     loadSidebar();
   }, []);
@@ -90,12 +91,25 @@ function WatchlistPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (selectedId) {
       loadWatchlistDetails();
     } else {
       setCurrentWatchlist(null);
     }
+  }, [selectedId]);
+
+  // Background Polling: Silently update prices every 15 seconds without a loading screen
+  useEffect(() => {
+    if (!selectedId) return;
+    const intervalId = setInterval(() => {
+      fetchWatchlistById(selectedId)
+        .then(data => setCurrentWatchlist(data))
+        .catch(console.error);
+    }, 15000); 
+
+    return () => clearInterval(intervalId);
   }, [selectedId]);
 
   const handleCreate = async (e) => {
@@ -178,14 +192,14 @@ function WatchlistPage() {
                 onChange={(e) => setNewListName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleCreate(e)} // Still works on Enter
                 placeholder="Name (e.g. Tech)"
-                className="flex-1 text-sm px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/40 transition-all shadow-sm"
+                className="flex-1 min-w-0 text-sm px-3 py-2 h-10 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/40 transition-all shadow-sm"
               />
               <button
                 onClick={handleCreate}
-                className="bg-blue-600 hover:bg-blue-700 text-white w-9 h-9 rounded-lg flex items-center justify-center text-xl font-bold transition-all hover:scale-105 active:scale-95 shadow-sm"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95 shadow-md flex-shrink-0"
                 title="Create Watchlist"
               >
-                +
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"></path></svg>
               </button>
             </div>
             {watchlists.length >= 10 && (
@@ -217,9 +231,9 @@ function WatchlistPage() {
                       e.stopPropagation();
                       handleDeleteList(list.id);
                     }}
-                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 px-1 transition-opacity"
+                    className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 p-1.5 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                   >
-                    ✕
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                   </button>
                 </div>
               ))
@@ -312,9 +326,9 @@ function WatchlistPage() {
                           <td className="px-6 py-4 text-right relative action-menu-container">
                             <button
                               onClick={() => setOpenMenu(openMenu === stock.symbol ? null : stock.symbol)}
-                              className="px-2 py-1 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                              className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all"
                             >
-                              ⋮
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
                             </button>
 
                             {openMenu === stock.symbol && (

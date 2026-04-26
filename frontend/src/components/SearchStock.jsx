@@ -33,7 +33,7 @@ function StockSearch({ watchlistId, onStockAdded }) {
       } else {
         setResults([]);
       }
-    }, 0);
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [query]);

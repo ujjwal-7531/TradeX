@@ -14,15 +14,15 @@ function TransactionsTable({ transactions }) {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden w-full border border-gray-100 dark:border-gray-700">
       <div className="overflow-x-auto">
-        <table className="w-full text-sm border-collapse text-left whitespace-nowrap">
+        <table className="w-full text-base border-collapse text-left whitespace-nowrap">
           <thead className="bg-gray-50/80 dark:bg-gray-800/80 text-left border-b border-gray-100 dark:border-gray-700">
             <tr>
-              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Action</th>
-              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Stock</th>
-              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">Quantity</th>
-              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">Execution Price</th>
-              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">Total Value</th>
-              <th className="px-6 py-4 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">Date & Time</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Action</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Stock</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">Quantity</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">Execution Price</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">Total Value</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider text-right">Date & Time</th>
             </tr>
           </thead>
 
@@ -37,7 +37,7 @@ function TransactionsTable({ transactions }) {
               return (
                 <tr key={tx.id} className="group hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors border-b border-gray-50 dark:border-gray-800/50 last:border-0">
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide ${typeColor} ${typeBg}`}>
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold tracking-wide ${typeColor} ${typeBg}`}>
                       {typeIcon} {tx.trade_type}
                     </span>
                   </td>
@@ -45,7 +45,7 @@ function TransactionsTable({ transactions }) {
                     {tx.symbol}
                   </td>
                   <td className="px-6 py-4 text-right text-gray-700 dark:text-gray-300 font-medium">
-                    {tx.quantity} <span className="text-gray-400 dark:text-gray-500 font-normal text-xs ml-1">shares</span>
+                    {tx.quantity} <span className="text-gray-400 dark:text-gray-500 font-normal text-sm ml-1">shares</span>
                   </td>
                   <td className="px-6 py-4 text-right text-gray-900 dark:text-gray-100 font-mono font-medium">
                     ₹{tx.price.toFixed(2)}
@@ -53,7 +53,7 @@ function TransactionsTable({ transactions }) {
                   <td className="px-6 py-4 text-right text-gray-900 dark:text-gray-100 font-mono font-bold">
                     ₹{totalValue.toFixed(2)}
                   </td>
-                  <td className="px-6 py-4 text-right text-gray-500 dark:text-gray-400 font-mono text-xs">
+                  <td className="px-6 py-4 text-right text-gray-500 dark:text-gray-400 font-mono text-sm">
                     {new Date(tx.created_at).toLocaleString("en-IN", { 
                       timeZone: "Asia/Kolkata",
                       day: "2-digit",

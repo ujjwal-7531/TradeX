@@ -43,3 +43,29 @@ def update_user_profile(
     db.commit()
     db.refresh(user)
     return user
+
+@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user_account(
+    current_user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    from app.models.watchlist import Watchlist
+    from app.models.watchlist_stock import WatchlistStock
+    from app.models.transaction import Transaction
+    from app.models.holding import Holding
+    from app.models.portfolio import Portfolio
+    
+    # Manually cascade delete to avoid constraint errors
+    user_watchlists = db.query(Watchlist.id).filter(Watchlist.user_id == current_user_id).all()
+    watchlist_ids = [w.id for w in user_watchlists]
+    if watchlist_ids:
+        db.query(WatchlistStock).filter(WatchlistStock.watchlist_id.in_(watchlist_ids)).delete(synchronize_session=False)
+
+    db.query(Watchlist).filter(Watchlist.user_id == current_user_id).delete(synchronize_session=False)
+    db.query(Transaction).filter(Transaction.user_id == current_user_id).delete(synchronize_session=False)
+    db.query(Holding).filter(Holding.user_id == current_user_id).delete(synchronize_session=False)
+    db.query(Portfolio).filter(Portfolio.user_id == current_user_id).delete(synchronize_session=False)
+    db.query(User).filter(User.id == current_user_id).delete(synchronize_session=False)
+
+    db.commit()
+    return None

@@ -2,14 +2,18 @@ import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import EditBalanceModal from "./EditBalanceModal";
 import ProfileModal from "./ProfileModal";
+import DeleteAccountModal from "./DeleteAccountModal";
 import { updateBalance } from "../api/portfolio";
 import { getFullName, getProfilePicture } from "../utils/auth";
+import api from "../api/axios";
+import toast from "react-hot-toast";
 
 // Added refreshData here so the component can use it
 function TopBar({ email, onLogout, onToggleTheme, isDark, refreshData }) {
   const [open, setOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [profilePic, setProfilePic] = useState(getProfilePicture());
   const [fullName, setFullName] = useState(getFullName());
   const dropdownRef = useRef(null);
@@ -44,6 +48,20 @@ function TopBar({ email, onLogout, onToggleTheme, isDark, refreshData }) {
     } catch (error) {
       console.error("Failed to update balance", error);
       alert("Error updating balance. Please try again.");
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await api.delete("/users/me");
+      toast.success("Account permanently deleted.");
+      onLogout();
+      setOpen(false);
+      setIsDeleteModalOpen(false);
+    } catch (error) {
+      console.error("Failed to delete account", error);
+      toast.error("Failed to delete account. Please try again.");
+      setIsDeleteModalOpen(false);
     }
   };
 
@@ -137,6 +155,17 @@ function TopBar({ email, onLogout, onToggleTheme, isDark, refreshData }) {
 
                 <button
                   onClick={() => {
+                    setIsDeleteModalOpen(true);
+                    setOpen(false);
+                  }}
+                  className="flex items-center w-full text-left px-3 py-2 text-sm font-medium text-red-700 dark:text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                >
+                  <span className="mr-3 text-lg leading-none mb-0.5">⚠️</span>
+                  Delete Account
+                </button>
+
+                <button
+                  onClick={() => {
                     onLogout();
                     setOpen(false);
                   }}
@@ -164,6 +193,12 @@ function TopBar({ email, onLogout, onToggleTheme, isDark, refreshData }) {
           setFullName(data.name);
           setProfilePic(data.picture);
         }}
+      />
+
+      <DeleteAccountModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
       />
     </div>
   );

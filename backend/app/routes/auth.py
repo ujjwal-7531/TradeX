@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
-from fastapi.security import OAuth2PasswordRequestForm
+
 from sqlalchemy.orm import Session
 
 from app.database import SessionLocal
@@ -35,7 +35,18 @@ def signup(
 ):
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        if existing_user.is_verified:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        else:
+            # Re-register: Overwrite unverified account with new password and fresh OTP
+            otp = ''.join(random.choices(string.digits, k=6))
+            existing_user.password_hash = hash_password(user.password)
+            existing_user.verification_otp = otp
+            existing_user.otp_expires_at = datetime.now(timezone.utc) + timedelta(minutes=5)
+            db.commit()
+            
+            background_tasks.add_task(send_otp_email, existing_user.email, otp)
+            return {"message": "Account updated. Please verify your email."}
 
     otp = ''.join(random.choices(string.digits, k=6))
     otp_expires_at = datetime.now(timezone.utc) + timedelta(minutes=5)
@@ -99,38 +110,7 @@ def login(request: Request, user: UserLogin, db: Session = Depends(get_db)):
         "profile_picture_url": db_user.profile_picture_url
     }
 
-@router.post("/token")
-def token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db)
-):
-    db_user = db.query(User).filter(
-        User.email == form_data.username
-    ).first()
 
-    if not db_user or not verify_password(
-        form_data.password,
-        db_user.password_hash
-    ):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid credentials"
-        )
-
-    if not db_user.is_verified:
-        raise HTTPException(
-            status_code=403,
-            detail="Email not verified"
-        )
-
-    access_token = create_access_token(
-        data={"user_id": db_user.id}
-    )
-
-    return {
-        "access_token": access_token,
-        "token_type": "bearer"
-    }
 
 @router.post("/verify-otp")
 def verify_otp(
@@ -164,9 +144,6 @@ def verify_otp(
     background_tasks.add_task(send_welcome_email, db_user.email)
     
     return {"message": "Email verified successfully"}
-
-from pydantic import EmailStr
-from typing import Dict
 
 @router.post("/resend-otp")
 @limiter.limit("1/minute")

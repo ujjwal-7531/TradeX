@@ -5,7 +5,7 @@ import PortfolioSummary from "../components/PortfolioSummary";
 
 import { removeToken, getEmail } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
-import { fetchTransactions } from "../api/transactions";
+
 import TopBar from "../components/TopBar";
 import MarketOverviewWidget from "../components/MarketOverviewWidget";
 import StockHeatmap from "../components/StockHeatmap";
@@ -24,11 +24,9 @@ function Dashboard() {
   };
 
   const [data, setData] = useState(null);
-  const [transactions, setTransactions] = useState([]);
 
   const refreshData = () => {
     fetchPortfolioSummary().then(setData);
-    fetchTransactions(5, 0).then(setTransactions);
   };
 
   useEffect(() => {

@@ -33,6 +33,7 @@ function VerifyOTP() {
   }, [resendTimer]);
 
   // If both email and otp are present in the URL on mount, automatically verify.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (initialEmail && initialOtp) {
       handleVerify(initialEmail, initialOtp);

@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { fetchPortfolioSummary } from "../api/portfolio";
 import { StatCardSkeleton } from "./Skeletons";
 
 function StatCard({ title, value, valueClass = "" }) {
