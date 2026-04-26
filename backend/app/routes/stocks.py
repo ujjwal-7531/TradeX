@@ -41,3 +41,15 @@ def search_stocks(
             "exchange": s.exchange
         } for s in results
     ]
+
+@router.get("/{symbol}/chart")
+def get_native_chart_data(
+    symbol: str, 
+    period: str = Query("1mo", description="e.g. 1mo, 3mo, 1y"),
+    user_id: int = Depends(get_current_user_id)
+):
+    from app.utils.market_data import fetch_historical_chart_data, get_ttl_hash
+    # Update cache every 1 hour (3600 seconds)
+    ttl = get_ttl_hash(3600)
+    data = fetch_historical_chart_data(symbol, period, ttl)
+    return {"symbol": symbol, "data": data}

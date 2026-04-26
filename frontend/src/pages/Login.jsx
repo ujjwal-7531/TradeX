@@ -93,6 +93,15 @@ function Login() {
       </form>
 
       <div className="mt-8 pt-6 border-t border-white/10 text-center">
+        <p className="text-sm text-gray-300 mb-2">
+          Forgot your password?
+          <button
+            onClick={() => navigate("/forgot-password")}
+            className="ml-2 text-indigo-400 font-bold hover:text-indigo-300 transition-colors"
+          >
+            Reset it here
+          </button>
+        </p>
         <p className="text-sm text-gray-300">
           New to the platform?
           <button

@@ -1,5 +1,7 @@
 import yfinance as yf
 import concurrent.futures
+from functools import lru_cache
+import time
 
 def fetch_single_price(sym):
     """Worker function to fetch a single stock's price."""
@@ -90,3 +92,31 @@ def get_sparkline_data(symbols, days=7):
     except Exception as e:
         print(f"Global Error in fetching sparklines: {e}")
         return {s: [] for s in symbols}
+
+def get_ttl_hash(seconds=3600):
+    """Return the same value within `seconds` time period to enable cache invalidation."""
+    return round(time.time() / seconds)
+
+@lru_cache(maxsize=200)
+def fetch_historical_chart_data(sym: str, period: str = "1mo", ttl_hash: int = None):
+    """
+    Fetches historical chart data. 
+    Cached to prevent massive payload downloads and solve rate limiting.
+    The ttl_hash ensures the cache resets every hour.
+    """
+    try:
+        ticker = yf.Ticker(f"{sym}.NS")
+        hist = ticker.history(period=period)
+        if hist.empty:
+            return []
+            
+        data = []
+        for d, row in hist.iterrows():
+            data.append({
+                "date": d.strftime("%Y-%m-%d"),
+                "price": round(float(row['Close']), 2)
+            })
+        return data
+    except Exception as e:
+        print(f"Error fetching chart data for {sym}: {e}")
+        return []

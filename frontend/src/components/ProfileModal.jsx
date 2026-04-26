@@ -23,9 +23,33 @@ function ProfileModal({ isOpen, onClose, onUpdateProfile }) {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("Image size must be less than 2MB");
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreviewUrl(reader.result);
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const size = Math.min(img.width, img.height);
+          
+          canvas.width = 200;
+          canvas.height = 200;
+          const ctx = canvas.getContext("2d");
+          
+          // Calculate center crop to keep it a perfect square
+          const offsetX = (img.width - size) / 2;
+          const offsetY = (img.height - size) / 2;
+          
+          ctx.drawImage(img, offsetX, offsetY, size, size, 0, 0, 200, 200);
+          
+          // Compress to JPEG to ensure the Base64 string mathematically fits inside MySQL's 65KB `TEXT` column limit!
+          const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.7);
+          setPreviewUrl(compressedDataUrl);
+        };
+        img.src = reader.result;
       };
       reader.readAsDataURL(file);
     }
@@ -92,7 +116,7 @@ function ProfileModal({ isOpen, onClose, onUpdateProfile }) {
               accept="image/*" 
               className="hidden" 
             />
-            <p className="text-xs text-gray-400 mt-2">Square images work best</p>
+            <p className="text-xs text-gray-400 mt-2 text-center">Square formats • Max 2MB</p>
           </div>
 
           {/* Name Edit */}
