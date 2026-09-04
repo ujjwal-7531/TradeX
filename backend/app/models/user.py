@@ -8,13 +8,10 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String(255), unique=True, nullable=False)
-    password_hash = Column(String(255), nullable=False)
+    password_hash = Column(String(255), nullable=True)
+    clerk_id = Column(String(255), unique=True, index=True, nullable=True)
     virtual_balance = Column(DECIMAL(15, 2), default=1000000.00, nullable=False)
     full_name = Column(String(255), nullable=True)
-    profile_picture_url = Column(Text, nullable=True)
-    is_verified = Column(Boolean, default=False, nullable=False)
-    verification_otp = Column(String(6), nullable=True)
-    otp_expires_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(
         DateTime(timezone=True),
         nullable=False,

@@ -2,6 +2,9 @@ import yfinance as yf
 import concurrent.futures
 from functools import lru_cache
 import time
+import json
+
+from app.core.redis_client import redis_client
 
 def fetch_single_price(sym):
     """Worker function to fetch a single stock's price."""
@@ -27,23 +30,49 @@ def fetch_single_price(sym):
 
 def get_live_prices(symbols):
     """
-    Fetches live prices for a list of symbols concurrently, solving the N+1 
-    sequential waiting problem and massively speeding up portfolio loading.
+    Fetches live prices for a list of symbols. 
+    Leverages Redis in-memory cache (30s TTL) for < 2ms speedups,
+    falling back to concurrent ThreadPoolExecutor for cache misses.
     """
     if not symbols:
         return {}
 
     price_dict = {}
+    missing_symbols = []
 
+    # 1. Try fetching from Redis cache first
+    if redis_client:
+        try:
+            for sym in symbols:
+                cached_price = redis_client.get(f"stock_price:{sym}")
+                if cached_price is not None:
+                    price_dict[sym] = float(cached_price)
+                else:
+                    missing_symbols.append(sym)
+        except Exception as e:
+            print(f"Redis cache lookup error: {e}")
+            missing_symbols = list(symbols)
+    else:
+        missing_symbols = list(symbols)
+
+    # If all requested symbols were found in Redis cache, return immediately!
+    if not missing_symbols:
+        return price_dict
+
+    # 2. Fetch missing symbols concurrently via ThreadPoolExecutor
     try:
-        # Use ThreadPoolExecutor to fetch prices concurrently (max 20 at a time)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
-            # executor.map will yield results as they complete
-            results = executor.map(fetch_single_price, symbols)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(20, len(missing_symbols))) as executor:
+            results = executor.map(fetch_single_price, missing_symbols)
             
             for sym, price in results:
                 price_dict[sym] = price
-                
+                # Store freshly fetched price in Redis with a 60-second (1 min) TTL
+                if redis_client and price > 0:
+                    try:
+                        redis_client.set(f"stock_price:{sym}", str(price), ex=60)
+                    except Exception as err:
+                        print(f"Redis cache set error for {sym}: {err}")
+                        
         return price_dict
     except Exception as e:
         print(f"Global Error in fetching prices: {e}")
@@ -93,17 +122,23 @@ def get_sparkline_data(symbols, days=7):
         print(f"Global Error in fetching sparklines: {e}")
         return {s: [] for s in symbols}
 
-def get_ttl_hash(seconds=3600):
-    """Return the same value within `seconds` time period to enable cache invalidation."""
-    return round(time.time() / seconds)
-
-@lru_cache(maxsize=200)
-def fetch_historical_chart_data(sym: str, period: str = "1mo", ttl_hash: int = None):
+def fetch_historical_chart_data(sym: str, period: str = "1mo"):
     """
     Fetches historical chart data. 
-    Cached to prevent massive payload downloads and solve rate limiting.
-    The ttl_hash ensures the cache resets every hour.
+    Leverages Upstash Redis cache (1 hour TTL / 3600s) for ultra-fast distributed lookups.
     """
+    cache_key = f"stock_chart:{sym}:{period}"
+    
+    # 1. Try fetching from Redis cache
+    if redis_client:
+        try:
+            cached_data = redis_client.get(cache_key)
+            if cached_data:
+                return json.loads(cached_data)
+        except Exception as e:
+            print(f"Redis chart lookup error for {sym}: {e}")
+
+    # 2. Cache miss: Fetch from yfinance
     try:
         ticker = yf.Ticker(f"{sym}.NS")
         hist = ticker.history(period=period)
@@ -116,6 +151,14 @@ def fetch_historical_chart_data(sym: str, period: str = "1mo", ttl_hash: int = N
                 "date": d.strftime("%Y-%m-%d"),
                 "price": round(float(row['Close']), 2)
             })
+
+        # Store fetched chart in Redis with a 3600-second (1 hour) TTL
+        if redis_client and data:
+            try:
+                redis_client.set(cache_key, json.dumps(data), ex=3600)
+            except Exception as err:
+                print(f"Redis chart set error for {sym}: {err}")
+
         return data
     except Exception as e:
         print(f"Error fetching chart data for {sym}: {e}")

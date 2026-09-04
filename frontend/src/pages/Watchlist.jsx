@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toggleTheme as toggleAppTheme, getTheme } from "../utils/theme";
 import { removeToken, getEmail } from "../utils/auth";
 import TopBar from "../components/TopBar";
 import BuySellCard from "../components/BuySellCard";
@@ -107,7 +108,7 @@ function WatchlistPage() {
       fetchWatchlistById(selectedId)
         .then(data => setCurrentWatchlist(data))
         .catch(console.error);
-    }, 15000); 
+    }, 30000); 
 
     return () => clearInterval(intervalId);
   }, [selectedId]);
@@ -148,13 +149,11 @@ function WatchlistPage() {
     removeToken();
     navigate("/login");
   };
-  const [isDark, setIsDark] = useState(
-    document.documentElement.classList.contains("dark"),
-  );
+  const [isDark, setIsDark] = useState(getTheme() === "dark");
 
   const toggleTheme = () => {
-    document.documentElement.classList.toggle("dark");
-    setIsDark(!isDark);
+    const next = toggleAppTheme();
+    setIsDark(next === "dark");
   };
 
   const refreshData = () => {
@@ -305,90 +304,111 @@ function WatchlistPage() {
                         </td>
                       </tr>
                     ) : (
-                      currentWatchlist.stocks.map((stock) => (
-                        <tr
-                          key={stock.symbol}
-                          // Remove hover:bg-gray-50 if it's causing issues, or strictly define both:
-                          className="group transition-colors border-b dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-blue-900/20"
-                        >
-                          <td className="px-6 py-4 font-bold text-blue-600 dark:text-blue-400">
-                            {stock.symbol}
-                          </td>
-                          <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
-                            {stock.name}
-                          </td>
-                          <td className="px-6 py-4 text-right font-mono font-semibold dark:text-white">
-                            ₹{stock.price}
-                          </td>
-                          <td className="px-6 py-4 flex justify-center">
-                            <Sparkline data={trends?.[stock.symbol] || []} />
-                          </td>
-                          <td className="px-6 py-4 text-right relative action-menu-container">
-                            <button
-                              onClick={() => setOpenMenu(openMenu === stock.symbol ? null : stock.symbol)}
-                              className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all"
-                            >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
-                            </button>
+                      currentWatchlist.stocks.map((stock, idx) => {
+                        const openUpward = idx >= currentWatchlist.stocks.length - 2 && currentWatchlist.stocks.length > 2;
 
-                            {openMenu === stock.symbol && (
-                              <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow z-10 text-left">
-                                <button
-                                  className="block w-full text-left px-3 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                  onClick={() => {
-                                    handleAction(stock.symbol, "BUY");
-                                    setOpenMenu(null);
-                                  }}
-                                >
-                                  Buy
-                                </button>
-                                <button
-                                  className="block w-full text-left px-3 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                  onClick={() => {
-                                    handleAction(stock.symbol, "SELL");
-                                    setOpenMenu(null);
-                                  }}
-                                >
-                                  Sell
-                                </button>
-                                <button
-                                  className="block w-full text-left px-3 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                  onClick={() => {
-                                    handleAction(stock.symbol, "CHART");
-                                    setOpenMenu(null);
-                                  }}
-                                >
-                                  View Chart
-                                </button>
-                                <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
-                                <button
-                                  className="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                                  onClick={() => {
-                                    handleRemoveStock(stock.symbol);
-                                    setOpenMenu(null);
-                                  }}
-                                >
-                                  Remove
-                                </button>
-                              </div>
-                            )}
-                          </td>
-                        </tr>
-                      ))
+                        return (
+                          <tr
+                            key={stock.symbol}
+                            className="group transition-colors border-b dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-blue-900/20"
+                          >
+                            <td className="px-6 py-4 font-bold text-blue-600 dark:text-blue-400">
+                              {stock.symbol}
+                            </td>
+                            <td className="px-6 py-4 text-gray-600 dark:text-gray-300">
+                              {stock.name}
+                            </td>
+                            <td className="px-6 py-4 text-right font-mono font-semibold dark:text-white">
+                              ₹{Number(stock.price || 0).toFixed(2)}
+                            </td>
+                            <td className="px-6 py-4 flex justify-center">
+                              <Sparkline data={trends?.[stock.symbol] || []} />
+                            </td>
+                            <td className="px-6 py-4 text-right relative action-menu-container">
+                              <button
+                                onClick={() => setOpenMenu(openMenu === stock.symbol ? null : stock.symbol)}
+                                className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all"
+                              >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+                              </button>
+
+                              {openMenu === stock.symbol && (
+                                <div className={`absolute right-6 w-36 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border border-gray-100 dark:border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden text-left transition-all ${
+                                  openUpward ? "bottom-full mb-2" : "top-full mt-1"
+                                }`}>
+                                  <button
+                                    className="block w-full text-left px-3 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    onClick={() => {
+                                      handleAction(stock.symbol, "BUY");
+                                      setOpenMenu(null);
+                                    }}
+                                  >
+                                    Buy
+                                  </button>
+                                  <button
+                                    className="block w-full text-left px-3 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    onClick={() => {
+                                      handleAction(stock.symbol, "SELL");
+                                      setOpenMenu(null);
+                                    }}
+                                  >
+                                    Sell
+                                  </button>
+                                  <button
+                                    className="block w-full text-left px-3 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    onClick={() => {
+                                      handleAction(stock.symbol, "CHART");
+                                      setOpenMenu(null);
+                                    }}
+                                  >
+                                    View Chart
+                                  </button>
+                                  <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                                  <button
+                                    className="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                    onClick={() => {
+                                      handleRemoveStock(stock.symbol);
+                                      setOpenMenu(null);
+                                    }}
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>
               </div>
               )}
             </div>
+          ) : watchlists.length === 0 ? (
+            /* Sleek Empty State when user has NO watchlists */
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-8 bg-white/50 dark:bg-gray-800/50 backdrop-blur-md border border-gray-100 dark:border-gray-700/60 rounded-3xl max-w-md mx-auto my-auto shadow-xl">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-500/20 to-indigo-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-3xl mb-4 border border-blue-500/20 shadow-inner">
+                📌
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">
+                Create Your First Watchlist
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm leading-relaxed">
+                To search stocks and track live market prices, create your first watchlist in the left sidebar (e.g. <span className="font-semibold text-blue-500 dark:text-blue-400">Tech Stocks</span> or <span className="font-semibold text-blue-500 dark:text-blue-400">Favorites</span>).
+              </p>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-semibold border border-blue-100 dark:border-blue-800/40">
+                <span>← Use the input box on the left sidebar to start</span>
+              </div>
+            </div>
           ) : (
-            /* Empty State when nothing is selected */
+            /* Empty State when watchlists exist but none is selected */
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
               <div className="text-6xl mb-4">📊</div>
               <p className="text-xl font-medium">
                 Select a watchlist to get started
               </p>
-              <p className="text-sm">Or create a new one in the sidebar</p>
+              <p className="text-sm">Or select one from the left sidebar</p>
             </div>
           )}
         </div>

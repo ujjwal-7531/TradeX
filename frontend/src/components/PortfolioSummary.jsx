@@ -11,8 +11,6 @@ function StatCard({ title, value, valueClass = "" }) {
 }
 
 function PortfolioSummary({ data }) {
-  // Remove early return and fetch effect from here (lifted up)
-
   if (!data) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -24,33 +22,36 @@ function PortfolioSummary({ data }) {
     );
   }
 
+  const pnl = Number(data.total_unrealized_pnl || 0);
+  const invested = Number(data.total_invested || 0);
+  const cash = Number(data.cash_balance || 0);
+  const currentVal = Number(data.current_value || 0);
+
   const pnlColor =
-    data.total_unrealized_pnl >= 0 ? "text-green-600" : "text-red-600";
+    pnl >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400";
   const pnl_percentage =
-    data.total_invested > 0
-      ? ((data.total_unrealized_pnl * 100) / data.total_invested).toFixed(2)
-      : 0.0;
+    invested > 0 ? ((pnl * 100) / invested).toFixed(2) : "0.00";
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <StatCard
         title="Cash Balance"
-        value={`₹ ${data.cash_balance.toFixed(2)}`}
+        value={`₹ ${cash.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
       />
 
       <StatCard
         title="Invested Amount"
-        value={`₹ ${data.total_invested.toFixed(2)}`}
+        value={`₹ ${invested.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
       />
 
       <StatCard
         title="Current Value"
-        value={`₹ ${data.current_value.toFixed(2)}`}
+        value={`₹ ${currentVal.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
       />
 
       <StatCard
         title="Net P&L"
-        value={`₹ ${data.total_unrealized_pnl.toFixed(2)} (${pnl_percentage}%)`}
+        value={`₹ ${pnl.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${pnl_percentage}%)`}
         valueClass={pnlColor}
       />
     </div>

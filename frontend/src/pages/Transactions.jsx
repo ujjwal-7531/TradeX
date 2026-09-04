@@ -6,6 +6,7 @@ import { TransactionsTableSkeleton } from "../components/Skeletons";
 import TopBar from "../components/TopBar";
 import { removeToken, getEmail } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
+import { toggleTheme as toggleAppTheme, getTheme } from "../utils/theme";
 
 function Transactions() {
   const navigate = useNavigate();
@@ -15,23 +16,24 @@ function Transactions() {
   const [limit, setLimit] = useState(20);
   const [downloading, setDownloading] = useState(false);
 
-  const [isDark, setIsDark] = useState(
-    document.documentElement.classList.contains("dark"),
-  );
+  const [isDark, setIsDark] = useState(getTheme() === "dark");
 
   const toggleTheme = () => {
-    document.documentElement.classList.toggle("dark");
-    setIsDark(!isDark);
+    const next = toggleAppTheme();
+    setIsDark(next === "dark");
   };
 
   useEffect(() => {
     setLoading(true);
     fetchTransactions(limit, 0)
       .then((res) => {
-        setTransactions(res);
+        setTransactions(res || []);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        setTransactions([]);
+        setLoading(false);
+      });
   }, [limit]); // Re-run effect whenever 'limit' changes
 
   const handleLogout = () => {

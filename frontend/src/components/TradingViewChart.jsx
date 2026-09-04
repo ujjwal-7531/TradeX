@@ -110,10 +110,16 @@ function TradingViewChart({ symbol, onClose }) {
                 tick={{fill: "#9ca3af", fontSize: 12, fontWeight: "500"}}
               />
               <Tooltip 
-                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)', background: 'rgba(255, 255, 255, 0.95)' }}
-                itemStyle={{ color: '#111827', fontWeight: '800' }}
+                contentStyle={{ 
+                  borderRadius: '12px', 
+                  border: '1px solid rgba(255,255,255,0.1)', 
+                  boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)', 
+                  background: document.documentElement.classList.contains("dark") ? 'rgba(17, 24, 39, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                  color: document.documentElement.classList.contains("dark") ? '#ffffff' : '#111827'
+                }}
+                itemStyle={{ color: document.documentElement.classList.contains("dark") ? '#60a5fa' : '#2563eb', fontWeight: '800' }}
                 formatter={(value) => [`₹${value}`, "Close Price"]}
-                labelStyle={{ color: '#6b7280', fontSize: '12px', marginBottom: '4px', textTransform: 'uppercase', fontWeight: "bold" }}
+                labelStyle={{ color: document.documentElement.classList.contains("dark") ? '#9ca3af' : '#6b7280', fontSize: '12px', marginBottom: '4px', textTransform: 'uppercase', fontWeight: "bold" }}
               />
               <Area 
                 type="monotone" 

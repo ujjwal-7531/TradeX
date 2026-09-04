@@ -1,14 +1,8 @@
 import os
 from fastapi import FastAPI
 from app.database import engine, Base
-from app.models.user import User
 from app.routes.auth import router as auth_router
-from app.models.stock import Stock
-from app.models.watchlist import Watchlist
-from app.models.watchlist_stock import WatchlistStock
 from app.routes.watchlists import router as watchlists_router
-from app.models.portfolio import Portfolio
-from app.models.holding import Holding
 from app.routes.trade import router as trade_router
 from app.routes.portfolio import router as portfolio_router
 from app.routes.transactions import router as transactions_router
@@ -26,13 +20,20 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 Base.metadata.create_all(bind=engine)
 
+allowed_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+]
+
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    allowed_origins.append(frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        os.getenv("FRONTEND_URL", "http://localhost:5173")
-    ],
+    allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

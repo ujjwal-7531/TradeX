@@ -36,9 +36,6 @@ def update_user_profile(
 
     if user_update.full_name is not None:
         user.full_name = user_update.full_name
-    
-    if user_update.profile_picture_url is not None:
-        user.profile_picture_url = user_update.profile_picture_url
 
     db.commit()
     db.refresh(user)

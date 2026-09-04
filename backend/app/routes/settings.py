@@ -23,10 +23,6 @@ def get_db():
         yield db
     finally:
         db.close()
-        
-@router.get("/ping")
-def settings_ping():
-    return {"message": "settings route working"}
 
 @router.post("/account")
 def update_account_settings(

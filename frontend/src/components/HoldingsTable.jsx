@@ -25,7 +25,7 @@ function HoldingsTable({ holdings, trends, onAction }) {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mt-6 overflow-visible w-full min-h-[300px] mb-32">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mt-6 overflow-visible w-full mb-8">
       <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-700">
         <h3 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Your Holdings</h3>
       </div>
@@ -46,11 +46,12 @@ function HoldingsTable({ holdings, trends, onAction }) {
             </tr>
           </thead>
         <tbody className="divide-y divide-gray-50 dark:divide-gray-800/50">
-          {holdings.map((h) => {
+          {holdings.map((h, idx) => {
             const isPositive = h.unrealized_pnl >= 0;
             const pnlColor = isPositive ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400";
             const pnlBg = isPositive ? "bg-emerald-50 dark:bg-emerald-500/10" : "bg-rose-50 dark:bg-rose-500/10";
             const pnlChevron = isPositive ? "▲" : "▼";
+            const openUpward = idx >= holdings.length - 2 && holdings.length > 2;
 
             return (
               <tr key={h.symbol} className="border-b border-gray-50 dark:border-gray-800/50 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
@@ -61,22 +62,22 @@ function HoldingsTable({ holdings, trends, onAction }) {
                   {h.quantity}
                 </td>
                 <td className="px-6 py-4 text-right text-gray-600 dark:text-gray-400 font-mono">
-                  ₹{h.avg_price.toFixed(2)}
+                  ₹{Number(h.avg_price || 0).toFixed(2)}
                 </td>
                 <td className="px-6 py-4 text-right text-gray-900 dark:text-gray-100 font-mono font-medium">
-                  ₹{h.current_price.toFixed(2)}
+                  ₹{Number(h.current_price || 0).toFixed(2)}
                 </td>
                 <td className="px-6 py-4 text-right text-gray-600 dark:text-gray-400 font-mono">
-                  ₹{h.invested_value.toFixed(2)}
+                  ₹{Number(h.invested_value || 0).toFixed(2)}
                 </td>
                 <td className="px-6 py-4 text-right text-gray-900 dark:text-gray-100 font-mono font-semibold">
-                  ₹{h.current_value.toFixed(2)}
+                  ₹{Number(h.current_value || 0).toFixed(2)}
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex justify-end">
                     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md font-mono font-medium text-sm ${pnlColor} ${pnlBg}`}>
                       <span className="text-[10px]">{pnlChevron}</span>
-                      <span>₹{Math.abs(h.unrealized_pnl).toFixed(2)}</span>
+                      <span>₹{Math.abs(Number(h.unrealized_pnl || 0)).toFixed(2)}</span>
                       <span className="opacity-75 relative -top-[1px]">({h.pnl_percent}%)</span>
                     </div>
                   </div>
@@ -87,16 +88,18 @@ function HoldingsTable({ holdings, trends, onAction }) {
                 <td className="px-6 py-4 text-right relative action-menu-container">
                   <button
                     onClick={() => setOpenMenu(openMenu === h.symbol ? null : h.symbol)}
-                    className="p-1.5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                    className="p-1.5 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all"
                     aria-label="Actions"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
                   </button>
 
                   {openMenu === h.symbol && (
-                    <div className="absolute right-0 mt-2 w-36 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border border-gray-100 dark:border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden text-left animate-in fade-in slide-in-from-top-2 text-left">
+                    <div className={`absolute right-6 w-36 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border border-gray-100 dark:border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden text-left transition-all ${
+                      openUpward ? "bottom-full mb-2" : "top-full mt-1"
+                    }`}>
                       <button
-                        className="block w-full text-left px-4 py-2.5 text-sm text-gray-800 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors"
+                        className="block w-full text-left px-3 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                         onClick={() => {
                           onAction(h.symbol, "BUY");
                           setOpenMenu(null);
@@ -106,7 +109,7 @@ function HoldingsTable({ holdings, trends, onAction }) {
                       </button>
 
                       <button
-                        className="block w-full text-left px-4 py-2.5 text-sm text-gray-800 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors"
+                        className="block w-full text-left px-3 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                         onClick={() => {
                           onAction(h.symbol, "SELL");
                           setOpenMenu(null);
@@ -116,7 +119,7 @@ function HoldingsTable({ holdings, trends, onAction }) {
                       </button>
 
                       <button
-                        className="block w-full text-left px-4 py-2.5 text-sm text-gray-800 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium transition-colors"
+                        className="block w-full text-left px-3 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                         onClick={() => {
                           onAction(h.symbol, "CHART");
                           setOpenMenu(null);

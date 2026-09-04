@@ -8,21 +8,23 @@ import BuySellCard from "../components/BuySellCard";
 import TradingViewChart from "../components/TradingViewChart";
 import { removeToken, getEmail } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
+import { toggleTheme as toggleAppTheme, getTheme } from "../utils/theme";
 
 function Holdings() {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [trends, setTrends] = useState({});
   const [tradeOpen, setTradeOpen] = useState(false);
   const [tradeType, setTradeType] = useState(null);
   const [tradeSymbol, setTradeSymbol] = useState("");
   const [chartSymbol, setChartSymbol] = useState(null);
 
-  const [isDark, setIsDark] = useState(document.documentElement.classList.contains("dark"));
+  const [isDark, setIsDark] = useState(getTheme() === "dark");
 
   const toggleTheme = () => {
-    document.documentElement.classList.toggle("dark");
-    setIsDark(!isDark);
+    const next = toggleAppTheme();
+    setIsDark(next === "dark");
   };
 
   const loadData = () => {
@@ -37,6 +39,8 @@ function Holdings() {
 
   useEffect(() => {
     loadData();
+    const intervalId = setInterval(loadData, 30000);
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleAction = (symbol, type) => {

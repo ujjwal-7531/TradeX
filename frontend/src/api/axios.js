@@ -5,8 +5,20 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://127.0.0.1:8000",
 });
 
-api.interceptors.request.use((config) => {
-  const token = getToken();
+api.interceptors.request.use(async (config) => {
+  let token = null;
+  if (window.Clerk?.session) {
+    try {
+      token = await window.Clerk.session.getToken();
+    } catch (err) {
+      console.warn("Failed to get Clerk session token:", err);
+    }
+  }
+  
+  if (!token) {
+    token = getToken();
+  }
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

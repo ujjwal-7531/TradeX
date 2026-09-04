@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { UserButton } from "@clerk/clerk-react";
 import EditBalanceModal from "./EditBalanceModal";
-import ProfileModal from "./ProfileModal";
 import DeleteAccountModal from "./DeleteAccountModal";
 import { updateBalance } from "../api/portfolio";
-import { getFullName, getProfilePicture } from "../utils/auth";
+import { getFullName } from "../utils/auth";
 import api from "../api/axios";
 import toast from "react-hot-toast";
 
@@ -12,9 +12,7 @@ import toast from "react-hot-toast";
 function TopBar({ email, onLogout, onToggleTheme, isDark, refreshData }) {
   const [open, setOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [profilePic, setProfilePic] = useState(getProfilePicture());
   const [fullName, setFullName] = useState(getFullName());
   const dropdownRef = useRef(null);
 
@@ -92,91 +90,33 @@ function TopBar({ email, onLogout, onToggleTheme, isDark, refreshData }) {
           </NavLink>
         </nav>
 
-        <div className="relative" ref={dropdownRef}>
+        <div className="flex items-center space-x-3">
           <button
-            onClick={() => setOpen((prev) => !prev)}
-            className="w-10 h-10 rounded-full bg-gradient-to-br border-2 border-white/20 from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white flex items-center justify-center font-semibold focus:outline-none focus:ring-4 focus:ring-blue-500/30 transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/20 overflow-hidden"
+            onClick={onToggleTheme}
+            className="p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            title="Toggle theme"
           >
-            {profilePic ? (
-              <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
-            ) : fullName ? (
-              fullName.charAt(0).toUpperCase()
-            ) : (
-              "u"
-            )}
+            {isDark ? "☀️" : "🌙"}
           </button>
 
-          {open && (
-            <div className="absolute right-0 mt-3 w-56 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border border-gray-100 dark:border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden transition-all origin-top-right animate-in fade-in slide-in-from-top-2">
-              <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Signed in as
-                </p>
-                <p className="text-sm font-medium text-black dark:text-white truncate">
-                  {fullName || email}
-                </p>
-              </div>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="p-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            title="Edit balance"
+          >
+            ⚙️
+          </button>
 
-              <div className="p-2 flex flex-col gap-1">
-                <button
-                  onClick={() => {
-                    setIsProfileModalOpen(true);
-                    setOpen(false);
-                  }}
-                  className="flex items-center w-full text-left px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
-                >
-                  <span className="mr-3">👤</span>
-                  Profile Settings
-                </button>
-
-                <button
-                  onClick={() => {
-                    onToggleTheme();
-                    setOpen(false);
-                  }}
-                  className="flex items-center w-full text-left px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
-                >
-                  <span className="mr-3">{isDark ? "☀️" : "🌙"}</span>
-                  {isDark ? "Light mode" : "Dark mode"}
-                </button>
-
-                <button
-                  onClick={() => {
-                    setIsModalOpen(true);
-                    setOpen(false);
-                  }}
-                  className="flex items-center w-full text-left px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/50 rounded-lg transition-colors"
-                >
-                  <span className="mr-3">⚙️</span>
-                  Edit balance
-                </button>
-
-                <div className="h-px bg-gray-100 dark:bg-gray-700 my-1 mx-2"></div>
-
-                <button
-                  onClick={() => {
-                    setIsDeleteModalOpen(true);
-                    setOpen(false);
-                  }}
-                  className="flex items-center w-full text-left px-3 py-2 text-sm font-medium text-red-700 dark:text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
-                >
-                  <span className="mr-3 text-lg leading-none mb-0.5">⚠️</span>
-                  Delete Account
-                </button>
-
-                <button
-                  onClick={() => {
-                    onLogout();
-                    setOpen(false);
-                  }}
-                  className="flex items-center w-full text-left px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
-                >
-                  <span className="mr-3 text-lg leading-none mb-0.5">🚪</span>
-                  Logout
-                </button>
-              </div>
-            </div>
-          )}
+          <div className="pl-2 border-l border-gray-200 dark:border-gray-700">
+            <UserButton 
+              afterSignOutUrl="/login"
+              appearance={{
+                elements: {
+                  avatarBox: "w-10 h-10 border-2 border-blue-500/30 shadow-md"
+                }
+              }}
+            />
+          </div>
         </div>
       </div>
 
@@ -184,15 +124,6 @@ function TopBar({ email, onLogout, onToggleTheme, isDark, refreshData }) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onUpdate={handleUpdateBalance}
-      />
-
-      <ProfileModal
-        isOpen={isProfileModalOpen}
-        onClose={() => setIsProfileModalOpen(false)}
-        onUpdateProfile={(data) => {
-          setFullName(data.name);
-          setProfilePic(data.picture);
-        }}
       />
 
       <DeleteAccountModal

@@ -9,5 +9,12 @@ export function setTheme(theme) {
 }
 
 export function getTheme() {
-  return localStorage.getItem("theme") || "light";
+  return localStorage.getItem("theme") || "dark";
+}
+
+export function toggleTheme() {
+  const current = getTheme();
+  const next = current === "dark" ? "light" : "dark";
+  setTheme(next);
+  return next;
 }

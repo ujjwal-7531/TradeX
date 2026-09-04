@@ -38,7 +38,10 @@ function BuySellCard({ type, symbol, onClose, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-all duration-300">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-all duration-300"
+      onClick={onClose}
+    >
       <div 
         className="relative w-full max-w-md overflow-hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transform transition-all duration-300 scale-100 opacity-100"
         onClick={(e) => e.stopPropagation()}

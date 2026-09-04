@@ -11,16 +11,16 @@ import MarketOverviewWidget from "../components/MarketOverviewWidget";
 import StockHeatmap from "../components/StockHeatmap";
 import PortfolioAnalytics from "../components/PortfolioAnalytics";
 
+import { toggleTheme as toggleAppTheme, getTheme } from "../utils/theme";
+
 function Dashboard() {
   const navigate = useNavigate();
 
-  const [isDark, setIsDark] = useState(
-    document.documentElement.classList.contains("dark")
-  );
+  const [isDark, setIsDark] = useState(getTheme() === "dark");
 
   const toggleTheme = () => {
-    document.documentElement.classList.toggle("dark");
-    setIsDark(!isDark);
+    const next = toggleAppTheme();
+    setIsDark(next === "dark");
   };
 
   const [data, setData] = useState(null);
@@ -31,6 +31,8 @@ function Dashboard() {
 
   useEffect(() => {
     refreshData();
+    const intervalId = setInterval(refreshData, 30000);
+    return () => clearInterval(intervalId);
   }, []);
 
   const handleLogout = () => {
