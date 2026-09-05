@@ -1,64 +1,10 @@
-# import time
-# from decimal import Decimal
-
-# # how long a cached price is valid (seconds)
-# CACHE_TTL = 30
-
-# # in-memory cache
-# _price_cache = {}
-
-
-# def _fetch_price_from_api(symbol: str) -> Decimal:
-#     """
-#     Actual API call to fetch stock price.
-#     This is your existing logic (Finnhub / Yahoo / etc).
-#     """
-#     # IMPORTANT: keep your existing API call here
-#     # Example placeholder:
-#     price = 3500.00  # replace with real API result
-#     return Decimal(str(price))
-
-
-# def get_stock_price(symbol: str) -> Decimal:
-#     symbol = symbol.upper()
-#     now = time.time()
-
-#     # 1️⃣ Check cache
-#     if symbol in _price_cache:
-#         cached = _price_cache[symbol]
-#         age = now - cached["timestamp"]
-
-#         if age < CACHE_TTL:
-#             return cached["price"]
-
-#     # 2️⃣ Cache miss or expired → fetch fresh
-#     price = _fetch_price_from_api(symbol)
-
-#     # 3️⃣ Update cache
-#     _price_cache[symbol] = {
-#         "price": price,
-#         "timestamp": now
-#     }
-    
-#     print("CACHE HIT:", symbol)
-#     print("CACHE MISS:", symbol)
-
-#     return price
-
 import time
 from decimal import Decimal
-from app.utils.market_data import get_live_prices
+from app.utils.market_data import get_live_prices, clean_float, fetch_single_price
 
-# Cache expiry time in seconds (change anytime)
+# Cache expiry time in seconds
 CACHE_TTL = 30
 
-# In-memory cache structure
-# {
-#   "TCS": {
-#       "price": Decimal("3500.25"),
-#       "timestamp": 1700000000.0
-#   }
-# }
 _price_cache = {}
 
 
@@ -71,10 +17,14 @@ def _fetch_price_from_api(symbol: str) -> Decimal:
     prices = get_live_prices([symbol])
     price = prices.get(symbol, 0.0)
 
+    # Fallback to single fetch if bulk returned 0.0
+    if price <= 0.0:
+        _, price = fetch_single_price(symbol)
+
     if price <= 0.0:
         raise ValueError(f"Failed to fetch a valid price for {symbol}. Market might be inaccessible.")
 
-    return Decimal(str(price))
+    return Decimal(str(round(price, 2)))
 
 
 def get_stock_price(symbol: str) -> Decimal:
@@ -89,11 +39,9 @@ def get_stock_price(symbol: str) -> Decimal:
         cached = _price_cache[symbol]
         age = now - cached["timestamp"]
 
-        if age < CACHE_TTL:
+        if age < CACHE_TTL and cached["price"] > 0:
             print(f"[CACHE HIT] Using cached price for {symbol}")
             return cached["price"]
-
-        print(f"[CACHE EXPIRED] Cache expired for {symbol}")
 
     # 2️⃣ Cache miss → fetch fresh price
     print(f"[CACHE MISS] Fetching new price for {symbol}")
@@ -106,4 +54,3 @@ def get_stock_price(symbol: str) -> Decimal:
     }
 
     return price
-

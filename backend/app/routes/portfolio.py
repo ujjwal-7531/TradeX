@@ -148,5 +148,8 @@ def portfolio_trends(
     from app.utils.market_data import get_sparkline_data
     if not symbols:
         return {}
-        
-    return get_sparkline_data(symbols, days=7)
+    try:
+        return get_sparkline_data(symbols, days=7)
+    except Exception as e:
+        print(f"Error in portfolio_trends: {e}")
+        return {}

@@ -36,7 +36,13 @@ def buy_stock(
             detail="Stock not found"
         )
         
-    price = Decimal(str(get_stock_price(symbol)))
+    try:
+        price = Decimal(str(get_stock_price(symbol)))
+    except Exception as err:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Could not fetch live price for {symbol}. Please try again."
+        )
 
     if price <= 0:
         raise HTTPException(
@@ -140,7 +146,13 @@ def sell_stock(
             detail="Insufficient quantity to sell"
         )
         
-    sell_price = Decimal(str(get_stock_price(symbol)))
+    try:
+        sell_price = Decimal(str(get_stock_price(symbol)))
+    except Exception as err:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Could not fetch live price for {symbol}. Please try again."
+        )
 
     if sell_price <= 0:
         raise HTTPException(
