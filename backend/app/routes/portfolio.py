@@ -70,28 +70,42 @@ def portfolio_summary(
         if not stock:
             continue  # safety guard
         
-        # Use bulk fetched price, fallback to 0
-        current_price = Decimal(str(live_prices.get(stock.symbol, 0.0)))
+        # Extract raw price safely
+        raw_price = live_prices.get(stock.symbol, 0.0) if live_prices else 0.0
+        if raw_price is None or (isinstance(raw_price, float) and (raw_price != raw_price or raw_price <= 0)):
+            raw_price = 0.0
+
+        try:
+            current_price = Decimal(str(round(float(raw_price), 2)))
+        except Exception:
+            current_price = Decimal("0.00")
         
-        quantity = holding.quantity
-        avg_price = holding.avg_price
+        quantity = holding.quantity or 0
+        avg_price = holding.avg_price or Decimal("0.00")
 
-        invested_value = (avg_price * quantity).quantize(
-            Decimal("0.01"), rounding=ROUND_HALF_UP
-        )
-
-        current_value = (current_price * quantity).quantize(
-            Decimal("0.01"), rounding=ROUND_HALF_UP
-        )
-
-        unrealized_pnl = (current_value - invested_value).quantize(
-            Decimal("0.01"), rounding=ROUND_HALF_UP
-        )
-        
-        if invested_value > 0:
-            pnl_percent = (unrealized_pnl / invested_value * 100).quantize(
+        try:
+            invested_value = (avg_price * quantity).quantize(
                 Decimal("0.01"), rounding=ROUND_HALF_UP
             )
+        except Exception:
+            invested_value = Decimal("0.00")
+
+        try:
+            current_value = (current_price * quantity).quantize(
+                Decimal("0.01"), rounding=ROUND_HALF_UP
+            )
+        except Exception:
+            current_value = Decimal("0.00")
+
+        unrealized_pnl = current_value - invested_value
+        
+        if invested_value > Decimal("0.00"):
+            try:
+                pnl_percent = (unrealized_pnl / invested_value * Decimal("100")).quantize(
+                    Decimal("0.01"), rounding=ROUND_HALF_UP
+                )
+            except Exception:
+                pnl_percent = Decimal("0.00")
         else:
             pnl_percent = Decimal("0.00")
             

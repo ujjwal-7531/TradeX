@@ -126,12 +126,15 @@ def get_watchlist_details(
 
     stocks_with_prices = []
     for stock in watchlist.stocks:
+        raw_price = live_prices.get(stock.symbol, 0.0) if live_prices else 0.0
+        if raw_price is None or (isinstance(raw_price, float) and raw_price != raw_price):
+            raw_price = 0.0
         stocks_with_prices.append({
             "id": stock.id,
             "symbol": stock.symbol,
             "name": stock.name,
             "exchange": stock.exchange,
-            "price": live_prices.get(stock.symbol, 0.0)
+            "price": round(float(raw_price), 2)
         })
 
     return {
